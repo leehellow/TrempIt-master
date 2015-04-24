@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
+import com.example.Ilay.myapplication.backend.EndpointUtils;
 
 /**
  * WARNING: This generated code is intended as a sample or starting point for using a
@@ -101,7 +102,7 @@ public class EventEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Event update(@Named("id") Long id, Event event) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        EndpointUtils.checkEventExists(id);
         ofy().save().entity(event).now();
         logger.info("Updated Event: " + event);
         return ofy().load().entity(event).now();
@@ -119,7 +120,7 @@ public class EventEndpoint {
             path = "event/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
+        EndpointUtils.checkEventExists(id);
         ofy().delete().type(Event.class).id(id).now();
         logger.info("Deleted Event with ID: " + id);
     }
@@ -136,12 +137,37 @@ public class EventEndpoint {
             path = "event/addPassenger",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addPassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
-        checkExists(eventid);
+        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkPassengerExists(passengerid);
         Event event = ofy().load().type(Event.class).id(eventid).now();
         Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
         event.addPassenger(passenger);
+        passenger.setEvent(event);
         ofy().save().entity(event).now();
+        ofy().save().entity(passenger).now();
         logger.info("Added passenger: " + passengerid + "to event: " + eventid);
+    }
+
+    /**
+     * Deletes the specified {@code Event}.
+     *
+     * @param eventid the ID of the entity to delete
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code Event}
+     */
+    @ApiMethod(
+            name = "removePassenger",
+            path = "event/removePassenger",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
+    public void removePassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
+        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkPassengerExists(passengerid);
+        Event event = ofy().load().type(Event.class).id(eventid).now();
+        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
+        event.removePassenger(passenger);
+        ofy().save().entity(event).now();
+        ofy().delete().entity(passenger);
+        logger.info("Removed passenger: " + passengerid + "from event: " + eventid);
     }
 
     /**
@@ -156,14 +182,38 @@ public class EventEndpoint {
             path = "event/addDriver",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
-        checkExists(eventid);
+        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkDriverExists(driverid);
         Event event = ofy().load().type(Event.class).id(eventid).now();
         Driver driver = ofy().load().type(Driver.class).id(driverid).now();
         event.addDriver(driver);
+        driver.setEvent(event);
         ofy().save().entity(event).now();
+        ofy().save().entity(driver).now();
         logger.info("Added driver: " + driverid + "to event: " + eventid);
     }
 
+    /**
+     * Deletes the specified {@code Event}.
+     *
+     * @param eventid the ID of the entity to delete
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code Event}
+     */
+    @ApiMethod(
+            name = "removeDriver",
+            path = "event/removeDriver",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
+    public void removeDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
+        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkDriverExists(driverid);
+        Event event = ofy().load().type(Event.class).id(eventid).now();
+        Driver driver = ofy().load().type(Driver.class).id(driverid).now();
+        event.removeDriver(driver);
+        ofy().save().entity(event).now();
+        ofy().delete().entity(driver);
+        logger.info("Removed driver: " + driverid + "from event: " + eventid);
+    }
 
     /**
      * List all entities.
@@ -199,7 +249,8 @@ public class EventEndpoint {
             name = "listEventPassengers",
             path = "event/listPassengers",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Passenger> listEventPassengers(@Named("id") Long id) {
+    public CollectionResponse<Passenger> listEventPassengers(@Named("id") Long id) throws NotFoundException {
+        EndpointUtils.checkEventExists(id);
         Event event = ofy().load().type(Event.class).id(id).now();
         List<Passenger> eventPassengerList = event.getPassengerList();
         return CollectionResponse.<Passenger>builder().setItems(eventPassengerList).build();
@@ -214,17 +265,12 @@ public class EventEndpoint {
             name = "listEventDrivers",
             path = "event/listDrivers",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Driver> listEventDrivers(@Named("id") Long id) {
+    public CollectionResponse<Driver> listEventDrivers(@Named("id") Long id) throws NotFoundException {
+        EndpointUtils.checkEventExists(id);
         Event event = ofy().load().type(Event.class).id(id).now();
         List<Driver> eventDriverList = event.getDriverList();
         return CollectionResponse.<Driver>builder().setItems(eventDriverList).build();
     }
 
-    private void checkExists(Long id) throws NotFoundException {
-        try {
-            ofy().load().type(Event.class).id(id).safe();
-        } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find Event with ID: " + id);
-        }
-    }
+
 }

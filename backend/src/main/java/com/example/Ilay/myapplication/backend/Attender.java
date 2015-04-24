@@ -1,5 +1,6 @@
 package com.example.Ilay.myapplication.backend;
 
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonBackReference;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
@@ -14,6 +15,7 @@ public abstract class Attender {
     @Id
     Long id;
     Ref<TrempitUser> trempitUser; // comment
+    @JsonBackReference
     Ref<Event> event;
     String fullName;
     Location startingLocation;

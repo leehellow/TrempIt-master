@@ -1,5 +1,6 @@
 package com.example.Ilay.myapplication.backend;
 
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonManagedReference;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -20,7 +21,9 @@ public class Event {
     Date startTime;
     Location location;
     String title;
+    @JsonManagedReference
     List<Ref<Driver>> driverList = new ArrayList<>();
+    @JsonManagedReference
     List<Ref<Passenger>> passengerList = new ArrayList<>();
     //Map<Driver, List<Passenger>> pendingPassengers; //TODO: use Driver as key or driverid?
 
@@ -107,8 +110,18 @@ public class Event {
         passengerList.add(passengerRef);
     }
 
+    public void removePassenger(Passenger passenger) {
+        Ref<Passenger> passengerRef = Ref.create(passenger);
+        passengerList.remove(passengerRef);
+    }
+
     public void addDriver(Driver newDriver){
         Ref<Driver> driverRef = Ref.create(newDriver);
         driverList.add(driverRef);
+    }
+
+    public void removeDriver(Driver driver) {
+        Ref<Driver> driverRef = Ref.create(driver);
+        driverList.remove(driverRef);
     }
 }
