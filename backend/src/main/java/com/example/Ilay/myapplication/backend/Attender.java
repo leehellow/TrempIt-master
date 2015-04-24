@@ -15,7 +15,7 @@ public abstract class Attender {
     @Id
     Long id;
     Ref<TrempitUser> trempitUser; // comment
-    @JsonBackReference
+    @JsonBackReference(value = "event-driver-list")
     Ref<Event> event;
     String fullName;
     Location startingLocation;

@@ -19,7 +19,8 @@
                 com.example.Ilay.myapplication.backend.EventEndpoint,
                 com.example.Ilay.myapplication.backend.LocationEndpoint,
                 com.example.Ilay.myapplication.backend.TrempitUserEndpoint,
-                com.example.Ilay.myapplication.backend.PassengerEndpoint</param-value>
+                com.example.Ilay.myapplication.backend.PassengerEndpoint,
+                com.example.Ilay.myapplication.backend.DriverEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

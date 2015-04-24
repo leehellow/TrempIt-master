@@ -1,5 +1,6 @@
 package com.example.Ilay.myapplication.backend;
 
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonBackReference;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Subclass;
 
@@ -8,6 +9,7 @@ import com.googlecode.objectify.annotation.Subclass;
  */
 @Subclass(index = true)
 public class Passenger extends Attender {
+    @JsonBackReference(value = "driver-passenger-list")
     Ref<Driver> driver;
 
     public Passenger() {

@@ -1,8 +1,12 @@
 package com.example.Ilay.myapplication.backend;
 
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonManagedReference;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Subclass;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,8 +16,10 @@ import java.util.List;
 public class Driver extends Attender {
     int availableSeats;
     Date arrivalTime;
-    List<Passenger> passengerList;
-    List<Passenger> pendingPassengerList;
+    @JsonManagedReference(value = "driver-passenger-list")
+    List<Ref<Passenger>> passengerList = new ArrayList<>();
+    //@JsonManagedReference(value = "driver-pendingpassenger-list")
+    List<Ref<Passenger>> pendingPassengerList = new ArrayList<>();
 
 
     //eran katz!!!!!
@@ -39,16 +45,58 @@ public class Driver extends Attender {
     }
 
     public List<Passenger> getPassengerList() {
-        return passengerList;
+        List<Passenger> ret = new ArrayList<>();
+        Iterator<Ref<Passenger>> it = passengerList.iterator();
+
+        while (it.hasNext())
+            ret.add(it.next().get());
+        return ret;
     }
 
-    public void setPassengerList(List<Passenger> passengerList) {
-        this.passengerList = passengerList;
+    public void setPassengerList(List<Passenger> newPassengerList) {
+        Iterator<Passenger> it = newPassengerList.iterator();
+
+        while (it.hasNext()) {
+            Ref<Passenger> newPassenger = Ref.create(it.next());
+            passengerList.add(newPassenger);
+        }
     }
 
-    public void approvePassenger(Passenger passenger) {
-        this.pendingPassengerList.remove(passenger);
-        this.passengerList.add(passenger);
-        passenger.setDriver(this);
+    public List<Passenger> getPendingPassengerList() {
+        List<Passenger> ret = new ArrayList<>();
+        Iterator<Ref<Passenger>> it = pendingPassengerList.iterator();
+
+        while (it.hasNext())
+            ret.add(it.next().get());
+        return ret;
+    }
+
+    public void setPendingPassengerList(List<Passenger> newPassengerList) {
+        Iterator<Passenger> it = newPassengerList.iterator();
+
+        while (it.hasNext()) {
+            Ref<Passenger> newPassenger = Ref.create(it.next());
+            pendingPassengerList.add(newPassenger);
+        }
+    }
+
+    public void addPassengerToPassengerList(Passenger passenger) {
+        Ref<Passenger> passengerRef = Ref.create(passenger);
+        this.passengerList.add(passengerRef);
+    }
+
+    public void removePassengerFromPassengerList(Passenger passenger) {
+        Ref<Passenger> passengerRef = Ref.create(passenger);
+        this.passengerList.remove(passengerRef);
+    }
+
+    public void addPassengerToPendingPassengerList(Passenger passenger) {
+        Ref<Passenger> passengerRef = Ref.create(passenger);
+        this.pendingPassengerList.add(passengerRef);
+    }
+
+    public void removePassengerFromPendingPassengerList(Passenger passenger) {
+        Ref<Passenger> passengerRef = Ref.create(passenger);
+        this.pendingPassengerList.remove(passengerRef);
     }
 }
