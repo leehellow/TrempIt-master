@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Ilay on 20/4/2015.
@@ -22,7 +21,7 @@ public class Event {
     Location location;
     String title;
     List<Ref<Driver>> driverList = new ArrayList<>();
-    List<Ref<Attender>> attenderList = new ArrayList<>();
+    List<Ref<Passenger>> passengerList = new ArrayList<>();
     //Map<Driver, List<Passenger>> pendingPassengers; //TODO: use Driver as key or driverid?
 
     public Event() {
@@ -85,27 +84,27 @@ public class Event {
         }
     }
 
-    public List<Attender> getAttenderList() {
-        List<Attender> ret = new ArrayList<>();
-        Iterator<Ref<Attender>> it = attenderList.iterator();
+    public List<Passenger> getPassengerList() {
+        List<Passenger> ret = new ArrayList<>();
+        Iterator<Ref<Passenger>> it = passengerList.iterator();
 
         while (it.hasNext())
             ret.add(it.next().get());
         return ret;
     }
 
-    public void setAttenderList(List<Attender> newAttenderList) {
-        Iterator<Attender> it = newAttenderList.iterator();
+    public void setPassengerList(List<Passenger> newPassengerList) {
+        Iterator<Passenger> it = newPassengerList.iterator();
 
         while (it.hasNext()) {
-            Ref<Attender> newAttender = Ref.create(it.next());
-            attenderList.add(newAttender);
+            Ref<Passenger> newPassenger = Ref.create(it.next());
+            passengerList.add(newPassenger);
         }
     }
 
-    public void addAttender(Attender newAttender) {
-        Ref<Attender> attenderRef = Ref.create(newAttender);
-        attenderList.add(attenderRef);
+    public void addPassenger(Passenger newPassenger) {
+        Ref<Passenger> passengerRef = Ref.create(newPassenger);
+        passengerList.add(passengerRef);
     }
 
     public void addDriver(Driver newDriver){

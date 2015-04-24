@@ -203,7 +203,7 @@ public class EventEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Attender> listEventAttenders(@Named("id") Long id) {
         Event event = ofy().load().type(Event.class).id(id).now();
-        List<Attender> eventAttenderList = event.getAttenderList();
+        List<Attender> eventAttenderList = event.getPassengerList();
         return CollectionResponse.<Attender>builder().setItems(eventAttenderList).build();
     }
 
