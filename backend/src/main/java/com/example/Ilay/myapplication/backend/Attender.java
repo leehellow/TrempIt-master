@@ -13,7 +13,7 @@ import com.googlecode.objectify.annotation.Id;
 public abstract class Attender {
     @Id
     Long id;
-    //Ref<TrempitUser> trempitUser; // comment
+    Ref<TrempitUser> trempitUser; // comment
     Ref<Event> event;
     String fullName;
     Location startingLocation;
