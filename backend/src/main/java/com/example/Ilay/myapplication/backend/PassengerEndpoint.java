@@ -27,9 +27,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * DO NOT deploy this code unchanged as part of a real application to real users.
  */
 @Api(
-        name = "passengerApi",
+        name = "trempitApi",
         version = "v1",
-        resource = "passenger",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.myapplication.Ilay.example.com",
                 ownerName = "backend.myapplication.Ilay.example.com",
@@ -55,7 +54,7 @@ public class PassengerEndpoint {
      * @throws NotFoundException if there is no {@code Passenger} with the provided ID.
      */
     @ApiMethod(
-            name = "get",
+            name = "getPassenger",
             path = "passenger/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Passenger get(@Named("id") Long id) throws NotFoundException {
@@ -71,7 +70,7 @@ public class PassengerEndpoint {
      * Inserts a new {@code Passenger}.
      */
     @ApiMethod(
-            name = "insert",
+            name = "insertPassenger",
             path = "passenger",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Passenger insert(Passenger passenger) {
@@ -96,7 +95,7 @@ public class PassengerEndpoint {
      *                           {@code Passenger}
      */
     @ApiMethod(
-            name = "update",
+            name = "updatePassenger",
             path = "passenger/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Passenger update(@Named("id") Long id, Passenger passenger) throws NotFoundException {
@@ -115,7 +114,7 @@ public class PassengerEndpoint {
      *                           {@code Passenger}
      */
     @ApiMethod(
-            name = "remove",
+            name = "removePassenger",
             path = "passenger/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
@@ -132,7 +131,7 @@ public class PassengerEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "list",
+            name = "listPassengers",
             path = "passenger",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Passenger> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {

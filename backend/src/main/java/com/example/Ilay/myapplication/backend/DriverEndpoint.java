@@ -27,9 +27,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * DO NOT deploy this code unchanged as part of a real application to real users.
  */
 @Api(
-        name = "driverApi",
+        name = "trempitApi",
         version = "v1",
-        resource = "driver",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.myapplication.Ilay.example.com",
                 ownerName = "backend.myapplication.Ilay.example.com",
@@ -55,7 +54,7 @@ public class DriverEndpoint {
      * @throws NotFoundException if there is no {@code Driver} with the provided ID.
      */
     @ApiMethod(
-            name = "get",
+            name = "getDriver",
             path = "driver/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Driver get(@Named("id") Long id) throws NotFoundException {
@@ -71,7 +70,7 @@ public class DriverEndpoint {
      * Inserts a new {@code Driver}.
      */
     @ApiMethod(
-            name = "insert",
+            name = "insertDriver",
             path = "driver",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Driver insert(Driver driver) {
@@ -96,7 +95,7 @@ public class DriverEndpoint {
      *                           {@code Driver}
      */
     @ApiMethod(
-            name = "update",
+            name = "updateDriver",
             path = "driver/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Driver update(@Named("id") Long id, Driver driver) throws NotFoundException {
@@ -115,7 +114,7 @@ public class DriverEndpoint {
      *                           {@code Driver}
      */
     @ApiMethod(
-            name = "remove",
+            name = "removeDriver",
             path = "driver/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
@@ -132,7 +131,7 @@ public class DriverEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "list",
+            name = "listDrivers",
             path = "driver",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Driver> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
@@ -159,7 +158,7 @@ public class DriverEndpoint {
      *                           {@code Driver}
      */
     @ApiMethod(
-            name = "approveRequest",
+            name = "approvePassengerRequest",
             path = "driver/approveRequest",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void approveRequest(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {
@@ -187,7 +186,7 @@ public class DriverEndpoint {
      *                           {@code Driver}
      */
     @ApiMethod(
-            name = "addRequest",
+            name = "addPassengerRequest",
             path = "driver/addRequest",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addRequest(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {

@@ -27,9 +27,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * DO NOT deploy this code unchanged as part of a real application to real users.
  */
 @Api(
-        name = "locationApi",
+        name = "trempitApi",
         version = "v1",
-        resource = "location",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.myapplication.Ilay.example.com",
                 ownerName = "backend.myapplication.Ilay.example.com",
@@ -55,7 +54,7 @@ public class LocationEndpoint {
      * @throws NotFoundException if there is no {@code Location} with the provided ID.
      */
     @ApiMethod(
-            name = "get",
+            name = "getLocation",
             path = "location/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Location get(@Named("id") Long id) throws NotFoundException {
@@ -71,7 +70,7 @@ public class LocationEndpoint {
      * Inserts a new {@code Location}.
      */
     @ApiMethod(
-            name = "insert",
+            name = "insertLocation",
             path = "location",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Location insert(Location location) {
@@ -96,7 +95,7 @@ public class LocationEndpoint {
      *                           {@code Location}
      */
     @ApiMethod(
-            name = "update",
+            name = "updateLocation",
             path = "location/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Location update(@Named("id") Long id, Location location) throws NotFoundException {
@@ -115,7 +114,7 @@ public class LocationEndpoint {
      *                           {@code Location}
      */
     @ApiMethod(
-            name = "remove",
+            name = "removeLocation",
             path = "location/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
@@ -132,7 +131,7 @@ public class LocationEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "list",
+            name = "listLocations",
             path = "location",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Location> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {

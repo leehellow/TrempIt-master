@@ -27,9 +27,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * DO NOT deploy this code unchanged as part of a real application to real users.
  */
 @Api(
-        name = "trempitUserApi",
+        name = "trempitApi",
         version = "v1",
-        resource = "trempitUser",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.myapplication.Ilay.example.com",
                 ownerName = "backend.myapplication.Ilay.example.com",
@@ -55,7 +54,7 @@ public class TrempitUserEndpoint {
      * @throws NotFoundException if there is no {@code TrempitUser} with the provided ID.
      */
     @ApiMethod(
-            name = "get",
+            name = "getTrempitUser",
             path = "trempitUser/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public TrempitUser get(@Named("id") Long id) throws NotFoundException {
@@ -71,7 +70,7 @@ public class TrempitUserEndpoint {
      * Inserts a new {@code TrempitUser}.
      */
     @ApiMethod(
-            name = "insert",
+            name = "insertTrempitUser",
             path = "trempitUser",
             httpMethod = ApiMethod.HttpMethod.POST)
     public TrempitUser insert(TrempitUser trempitUser) {
@@ -96,7 +95,7 @@ public class TrempitUserEndpoint {
      *                           {@code TrempitUser}
      */
     @ApiMethod(
-            name = "update",
+            name = "updateTrempitUser",
             path = "trempitUser/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public TrempitUser update(@Named("id") Long id, TrempitUser trempitUser) throws NotFoundException {
@@ -115,7 +114,7 @@ public class TrempitUserEndpoint {
      *                           {@code TrempitUser}
      */
     @ApiMethod(
-            name = "remove",
+            name = "removeTrempitUser",
             path = "trempitUser/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
@@ -135,7 +134,7 @@ public class TrempitUserEndpoint {
      *                           {@code TrempitUser}
      */
     @ApiMethod(
-            name = "addPassengerToUser",
+            name = "addPassengerToTrempitUser",
             path = "trempitUser/addPassengerToUser",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addPassengerToUser(@Named("TrempitUserId") Long TrempitUserId, @Named("PassengerId") Long PassengerId) throws NotFoundException {
@@ -156,7 +155,7 @@ public class TrempitUserEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "list",
+            name = "listTrempitUsers",
             path = "trempitUser",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<TrempitUser> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {

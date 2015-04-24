@@ -28,9 +28,8 @@ import com.example.Ilay.myapplication.backend.EndpointUtils;
  * DO NOT deploy this code unchanged as part of a real application to real users.
  */
 @Api(
-        name = "eventApi",
+        name = "trempitApi",
         version = "v1",
-        resource = "event",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.myapplication.Ilay.example.com",
                 ownerName = "backend.myapplication.Ilay.example.com",
@@ -56,7 +55,7 @@ public class EventEndpoint {
      * @throws NotFoundException if there is no {@code Event} with the provided ID.
      */
     @ApiMethod(
-            name = "get",
+            name = "getEvent",
             path = "event/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Event get(@Named("id") Long id) throws NotFoundException {
@@ -72,7 +71,7 @@ public class EventEndpoint {
      * Inserts a new {@code Event}.
      */
     @ApiMethod(
-            name = "insert",
+            name = "insertEvent",
             path = "event",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Event insert(Event event) {
@@ -97,7 +96,7 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "update",
+            name = "updateEvent",
             path = "event/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Event update(@Named("id") Long id, Event event) throws NotFoundException {
@@ -116,7 +115,7 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "remove",
+            name = "removeEvent",
             path = "event/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
@@ -133,7 +132,7 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "addPassenger",
+            name = "addPassengerToEvent",
             path = "event/addPassenger",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addPassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
@@ -156,7 +155,7 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "removePassenger",
+            name = "removePassengerFromEvent",
             path = "event/removePassenger",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void removePassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
@@ -178,7 +177,7 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "addDriver",
+            name = "addDriverToEvent",
             path = "event/addDriver",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
@@ -201,7 +200,7 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "removeDriver",
+            name = "removeDriverFromEvent",
             path = "event/removeDriver",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void removeDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
@@ -223,7 +222,7 @@ public class EventEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "list",
+            name = "listEvents",
             path = "event",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Event> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
