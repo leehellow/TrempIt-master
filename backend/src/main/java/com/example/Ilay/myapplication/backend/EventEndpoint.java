@@ -132,16 +132,16 @@ public class EventEndpoint {
      *                           {@code Event}
      */
     @ApiMethod(
-            name = "addAttender",
-            path = "event/addAttender",
+            name = "addPassenger",
+            path = "event/addPassenger",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addAttender(@Named("eventid") Long eventid, @Named("attenderid") Long attenderid) throws NotFoundException {
+    public void addPassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
         checkExists(eventid);
         Event event = ofy().load().type(Event.class).id(eventid).now();
-        Attender attender = ofy().load().type(Attender.class).id(attenderid).now();
-        event.addAttender(attender);
+        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
+        event.addPassenger(passenger);
         ofy().save().entity(event).now();
-        logger.info("Added attender: " + attenderid + "to event: " + eventid);
+        logger.info("Added passenger: " + passengerid + "to event: " + eventid);
     }
 
     /**
@@ -155,16 +155,14 @@ public class EventEndpoint {
             name = "addDriver",
             path = "event/addDriver",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addDriver(@Named("eventid") Long eventid, @Named("attenderid") Long attenderid) throws NotFoundException {
+    public void addDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
         checkExists(eventid);
         Event event = ofy().load().type(Event.class).id(eventid).now();
-        Driver driver = ofy().load().type(Driver.class).id(attenderid).now();
-        /////////*******/////
+        Driver driver = ofy().load().type(Driver.class).id(driverid).now();
         event.addDriver(driver);
         ofy().save().entity(event).now();
-        logger.info("Added driver: " + attenderid + "to event: " + eventid);
+        logger.info("Added driver: " + driverid + "to event: " + eventid);
     }
-
 
 
     /**
@@ -198,13 +196,28 @@ public class EventEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "listEventAttenders",
-            path = "event/listAttenders",
+            name = "listEventPassengers",
+            path = "event/listPassengers",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Attender> listEventAttenders(@Named("id") Long id) {
+    public CollectionResponse<Passenger> listEventPassengers(@Named("id") Long id) {
         Event event = ofy().load().type(Event.class).id(id).now();
-        List<Attender> eventAttenderList = event.getPassengerList();
-        return CollectionResponse.<Attender>builder().setItems(eventAttenderList).build();
+        List<Passenger> eventPassengerList = event.getPassengerList();
+        return CollectionResponse.<Passenger>builder().setItems(eventPassengerList).build();
+    }
+
+    /**
+     * List all entities.
+     *
+     * @return a response that encapsulates the result list and the next page token/cursor
+     */
+    @ApiMethod(
+            name = "listEventDrivers",
+            path = "event/listDrivers",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public CollectionResponse<Driver> listEventDrivers(@Named("id") Long id) {
+        Event event = ofy().load().type(Event.class).id(id).now();
+        List<Driver> eventDriverList = event.getDriverList();
+        return CollectionResponse.<Driver>builder().setItems(eventDriverList).build();
     }
 
     private void checkExists(Long id) throws NotFoundException {
