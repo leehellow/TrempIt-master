@@ -21,6 +21,23 @@ public final class EndpointUtils {
         }
     }
 
+    public static boolean checkEventNotExists(Event event) throws NotFoundException {
+            Event event1;
+            try {
+                event1 = ofy().load().entity(event).now();
+                if (event1 == null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            catch (Exception e) {
+                return true;
+            }
+
+
+    }
+
     public static void checkPassengerExists(Long id) throws NotFoundException {
         try {
             ofy().load().type(Passenger.class).id(id).safe();

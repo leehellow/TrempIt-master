@@ -74,16 +74,22 @@ public class EventEndpoint {
             name = "insertEvent",
             path = "event",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Event insert(Event event) {
+    public Event insert(Event event) throws NotFoundException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that event.id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        ofy().save().entity(event).now();
-        logger.info("Created Event with ID: " + event.getId());
+        if (EndpointUtils.checkEventNotExists(event)) { //TODO: figure out how to avoid duplicate inserts
+            ofy().save().entity(event).now();
+            logger.info("Created Event with ID: " + event.getId());
+            return ofy().load().entity(event).now();
+        }
+        else {
+            return null;
+        }
 
-        return ofy().load().entity(event).now();
+
     }
 
     /**

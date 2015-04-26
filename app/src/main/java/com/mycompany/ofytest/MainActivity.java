@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,24 +21,28 @@ import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
-    ListView listView;
-    ArrayAdapter<Event> arrayAdapter;
+    ArrayList<Event> events = new ArrayList<>();
+    EventAdapter eventAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView = (ListView) findViewById(R.id.listview);
+        eventAdapter = new EventAdapter(this, events);
+
+        new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
+
+
+        final ListView listView = (ListView) findViewById(R.id.listview);
+        listView.setAdapter(eventAdapter);
     }
 
-    public void getQuotes(View v) {
-        new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -61,6 +66,10 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void startEventActivity(View view) {
+        Event event = (Event) view.getTag();
+        Log.d("TrempIt", "Event title: " + event.getTitle());
+    }
 
      class EndpointsAsyncTask extends AsyncTask<Void, Void, List<Event>> {
         private  TrempitApi myApiService = null;
@@ -78,45 +87,45 @@ public class MainActivity extends ActionBarActivity {
                         // options for running against local devappserver
                         // - 10.0.2.2 is localhost's IP address in Android emulator
                         // - turn off compression when running against local devappserver
-                        .setRootUrl("https://trans-setup-92615.appspot.com/_ah/api/").setApplicationName("Trempit");
+                        .setRootUrl("http://192.168.43.113:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        }).setApplicationName("Trempit");
                 // end options for devappserver
 
                 myApiService = builder.build();
             }
 
             try {
-                Event event = new Event();
-                event.setId((long) 100);
-                event.setTitle("Birthday2");
-                myApiService.insertEvent(event).execute();
-                Passenger passenger = new Passenger();
-                passenger.setId((long) 10);
-                passenger.setFullName("Eran Katz");
-                myApiService.insertPassenger(passenger).execute();
-                com.example.ilay.myapplication.backend.trempitApi.model.Driver driver = new com.example.ilay.myapplication.backend.trempitApi.model.Driver();
-                driver.setId((long) 20);
-                driver.setFullName("Eran Nahag");
-                myApiService.insertDriver(driver).execute();
-                myApiService.addPassengerToEvent(event.getId(),passenger.getId()).execute();
+                Event event1 = new Event();
+                event1.setTitle("Birthday");
 
-                myApiService.addDriverToEvent(driver.getId(), event.getId()).execute();
+                Event event2 = new Event();
+                event2.setTitle("Party");
 
+                myApiService.insertEvent(event1).execute();
+                //myApiService.insertEvent(event2).execute();
                 return myApiService.listEvents().execute().getItems();
             } catch (IOException e) {
+                Log.d("Trempit", "IO error");
                 return Collections.EMPTY_LIST;
             }
         }
 
         @Override
         protected void onPostExecute(List<Event> result) {
-            for (Event q : result) {
-                List<Passenger> passlist= q.getPassengerList();
-                Toast.makeText(context, passlist.get(0).getFullName() + " : " + q.getTitle(), Toast.LENGTH_LONG).show();
-
-            }
-
-//            arrayAdapter = new ArrayAdapter<Event>(context, R.layout.item_event, result);
-//            listView.setAdapter(arrayAdapter);
+//            for (Event q : result) {
+//                List<Passenger> passlist= q.getPassengerList();
+//                Toast.makeText(context, passlist.get(0).getFullName() + " : " + q.getTitle(), Toast.LENGTH_LONG).show();
+//
+//            }
+            Event event = result.get(0);
+            Log.d("TrempIt", "onpost"  + event.getTitle());
+            eventAdapter.addAll(result);
+            Log.d("TrempIt", "after post");
+            eventAdapter.notifyDataSetChanged();
 
 
 

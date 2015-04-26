@@ -4,22 +4,6 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
-
-    <TextView
-        android:text="Hello Cloud Endpoints"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Get Quotes"
-        android:id="@+id/btnGetQuotes"
-        android:layout_below="@+id/textView"
-        android:onClick="getQuotes"
-        />
-
     <ListView
         android:id="@+id/listview"
         android:layout_width="wrap_content"
