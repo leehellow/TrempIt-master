@@ -1,6 +1,7 @@
 package com.mycompany.ofytest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.ListView;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
 import com.example.ilay.myapplication.backend.trempitApi.model.Event;
+import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
@@ -26,6 +28,7 @@ import java.util.List;
 public class TrempitActivity extends ActionBarActivity {
     ArrayList<Event> events = new ArrayList<>();
     EventAdapter eventAdapter;
+    TrempitUser currentUser = new TrempitUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +39,11 @@ public class TrempitActivity extends ActionBarActivity {
         new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
 
 
-        final ListView listView = (ListView) findViewById(R.id.listview);
+        final ListView listView = (ListView) findViewById(R.id.eventlistview);
         listView.setAdapter(eventAdapter);
+
+        currentUser.setFullName("Eran Katz");
+        currentUser.setId((long) 1000);
     }
 
 
@@ -66,6 +72,10 @@ public class TrempitActivity extends ActionBarActivity {
     public void startEventActivity(View view) {
         Event event = (Event) view.getTag();
         Log.d("TrempIt", "Event title: " + event.getTitle());
+        Intent intent = new Intent(this, DriversActivity.class);
+        intent.putExtra("user", currentUser.getId());//TODO: what is the first parameter for?
+        intent.putExtra("event", event.getId());
+        startActivity(intent);
     }
 
      class EndpointsAsyncTask extends AsyncTask<Void, Void, List<Event>> {
@@ -96,14 +106,6 @@ public class TrempitActivity extends ActionBarActivity {
             }
 
             try {
-                Event event1 = new Event();
-                event1.setTitle("Birthday");
-
-                Event event2 = new Event();
-                event2.setTitle("Party");
-
-                myApiService.insertEvent(event1).execute();
-                //myApiService.insertEvent(event2).execute();
                 return myApiService.listEvents().execute().getItems();
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
@@ -118,8 +120,6 @@ public class TrempitActivity extends ActionBarActivity {
 //                Toast.makeText(context, passlist.get(0).getFullName() + " : " + q.getTitle(), Toast.LENGTH_LONG).show();
 //
 //            }
-            Event event = result.get(0);
-            Log.d("TrempIt", "onpost"  + event.getTitle());
             eventAdapter.addAll(result);
             Log.d("TrempIt", "after post");
             eventAdapter.notifyDataSetChanged();
