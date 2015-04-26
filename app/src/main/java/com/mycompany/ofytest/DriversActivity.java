@@ -149,9 +149,6 @@ public class DriversActivity extends ActionBarActivity{
             driverAdapter.notifyDataSetChanged();
 
 
-
-
-
         }
     }
 
