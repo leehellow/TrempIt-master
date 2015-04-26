@@ -51,16 +51,18 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         setContentView(R.layout.activity_trempit);
         buildGoogleApiClient();
 
+        currentUser.setFullName("Eran Katz");
+        currentUser.setId((long) 1000);
+
         eventAdapter = new EventAdapter(this, events);
 
-        new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
+
 
 
         final ListView listView = (ListView) findViewById(R.id.eventlistview);
         listView.setAdapter(eventAdapter);
 
-        currentUser.setFullName("Eran Katz");
-        currentUser.setId((long) 1000);
+
     }
 
 
@@ -139,6 +141,9 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         } else {
             Log.d("TrempIt", "could not find location");
         }
+
+        // added here so the currentUser location will be loaded from GPS before storing in datastore
+        new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
