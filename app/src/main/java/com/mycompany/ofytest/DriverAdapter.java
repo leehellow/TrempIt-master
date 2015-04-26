@@ -26,7 +26,7 @@ public class DriverAdapter extends ArrayAdapter<Driver> {
         Driver driver = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_event, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_driver, parent, false);
         }
         Button button = (Button) convertView.findViewById(R.id.driverButton);
         button.setText(driver.getFullName());

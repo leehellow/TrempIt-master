@@ -94,7 +94,7 @@ public class TrempitActivity extends ActionBarActivity {
                         // options for running against local devappserver
                         // - 10.0.2.2 is localhost's IP address in Android emulator
                         // - turn off compression when running against local devappserver
-                        .setRootUrl("http://192.168.43.113:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                        .setRootUrl("http://10.0.0.10:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
                             public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
@@ -120,6 +120,11 @@ public class TrempitActivity extends ActionBarActivity {
 //                Toast.makeText(context, passlist.get(0).getFullName() + " : " + q.getTitle(), Toast.LENGTH_LONG).show();
 //
 //            }
+            if (result == null || result.isEmpty()) {
+                Log.d("TrempIt", "No events retrieved");
+                return;
+            }
+
             eventAdapter.addAll(result);
             Log.d("TrempIt", "after post");
             eventAdapter.notifyDataSetChanged();

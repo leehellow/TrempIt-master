@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
@@ -81,7 +82,7 @@ public class DriversActivity extends ActionBarActivity{
     }
 
 
-    public void startEventActivity(View view) {
+    public void startDriverActivity(View view) {
         Driver driver = (Driver) view.getTag();
         Log.d("TrempIt", "Driver name: " + driver.getFullName());
 //        Intent intent = new Intent(this, DriversActivity.class);
@@ -106,7 +107,7 @@ public class DriversActivity extends ActionBarActivity{
                         // options for running against local devappserver
                         // - 10.0.2.2 is localhost's IP address in Android emulator
                         // - turn off compression when running against local devappserver
-                        .setRootUrl("http://192.168.43.113:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                        .setRootUrl("http://10.0.0.10:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
                             public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
@@ -121,8 +122,8 @@ public class DriversActivity extends ActionBarActivity{
                 Driver driver = new Driver();
                 driver.setFullName("Eran Nahag");
                 driver.setId((long) 10000);
-                myApiService.insertDriver(driver);
-                myApiService.addDriverToEvent(driver.getId(), eventId);
+                myApiService.insertDriver(driver).execute();
+                myApiService.addDriverToEvent(driver.getId(), eventId).execute();
                 return myApiService.listEventDrivers(eventId).execute().getItems();
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
@@ -137,6 +138,11 @@ public class DriversActivity extends ActionBarActivity{
 //                Toast.makeText(context, passlist.get(0).getFullName() + " : " + q.getTitle(), Toast.LENGTH_LONG).show();
 //
 //            }
+
+            if (result == null || result.isEmpty()) {
+                Log.d("TrempIt", "No drivers retrieved");
+                return;
+            }
 
             driverAdapter.addAll(result);
             Log.d("TrempIt", "after post");
