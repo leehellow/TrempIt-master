@@ -1,66 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/loginUsername"
-        android:layout_width="wrap_content"
+        android:id="@+id/availableSeats"
         android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignBaseline="@+id/loginUsernameTextfield"
-        android:text="Username "/>
+        android:layout_alignBaseline="@+id/availableSeatsTextfield"
+        android:text="@string/insert_number_of_available_seats" />
 
     <EditText
-        android:id="@id/loginUsernameTextfield"
+        android:id="@id/availableSeatsTextfield"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/availableSeats"
+        android:hint="4"/>
+
+    <TextView
+        android:id="@+id/chooseArrivalTime"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/loginUsername"
-        android:hint="@string/insert_username"/>
+        android:layout_below="@id/availableSeatsTextfield"
+        android:text="@string/choose_arrival_time"/>
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/loginUsernameTextfield"
-        android:layout_centerHorizontal="true"
-        android:onClick="login"
-        android:text="@string/login_to_trempit"/>
-
-    <TextView
-        android:id="@+id/loginError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/loginButton"
-        android:textColor="#FF0000"
-        android:text=""/>
-
-    <TextView
-        android:id="@+id/signupUsername"
-        android:layout_width="wrap_content"
+    <Spinner
+        android:id="@+id/dates"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/loginError"
-        android:layout_alignBaseline="@+id/signupUsernameTextfield"
-        android:text="Username "/>
+        android:layout_below="@id/chooseArrivalTime"/>
 
-    <EditText
-        android:id="@id/signupUsernameTextfield"
-        android:layout_width="fill_parent"
+    <Spinner
+        android:id="@+id/times"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/loginError"
-        android:layout_toRightOf="@id/signupUsername"
-        android:hint="@string/insert_username"
-        android:inputType="textEmailAddress" />
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/chooseArrivalTime"/>
 
     <TextView
         android:id="@+id/country"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/signupUsernameTextfield"
+        android:layout_below="@id/dates"
         android:layout_alignBaseline="@+id/countryTextfield"
         android:text="Country      "/>
 
@@ -68,7 +51,7 @@
         android:id="@id/countryTextfield"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/signupUsernameTextfield"
+        android:layout_below="@id/times"
         android:layout_toRightOf="@id/country"
         android:hint="@string/insert_country"
         android:inputType="textEmailAddress" />
@@ -126,21 +109,5 @@
         android:layout_toRightOf="@id/number"
         android:hint="@string/insert_house_number" />
 
-    <Button
-        android:id="@+id/signupButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/numberTextfield"
-        android:layout_centerHorizontal="true"
-        android:onClick="signup"
-        android:text="@string/signup_to_trempit" />
-
-    <TextView
-        android:id="@+id/signupError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/signupButton"
-        android:textColor="#FF0000"
-        android:text=""/>
 
 </RelativeLayout>
