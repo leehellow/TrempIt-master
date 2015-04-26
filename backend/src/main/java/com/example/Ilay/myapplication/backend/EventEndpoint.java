@@ -80,7 +80,7 @@ public class EventEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        if (EndpointUtils.checkEventNotExists(event)) { //TODO: figure out how to avoid duplicate inserts
+        if (EndpointUtils.checkEventNotExists(event)) { //TODO:figure out how to avoid duplicate inserts
             ofy().save().entity(event).now();
             logger.info("Created Event with ID: " + event.getId());
             return ofy().load().entity(event).now();
