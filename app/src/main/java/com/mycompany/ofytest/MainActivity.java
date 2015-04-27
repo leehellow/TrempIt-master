@@ -28,16 +28,16 @@ public class MainActivity extends ActionBarActivity {
 
         if (username == null){
             error.setText("Invalid username");
-        }
-
-        else if(userList.containsKey(username)){
-            intent.putExtra(USER, userList.get(username).getId()); //TODO: get user from id using API in the next activity
-            startActivity(intent);
-        }
-        else{
-            error.setText("User does not exist");
-        }
     }
+
+    else if(userList.containsKey(username)){
+        intent.putExtra(USER, userList.get(username).getId()); //TODO: get user from id using API in the next activity
+        startActivity(intent);
+    }
+    else{
+        error.setText("User does not exist");
+    }
+}
 
     public void signup(View view){
         TextView error = (TextView) findViewById(R.id.signupError);

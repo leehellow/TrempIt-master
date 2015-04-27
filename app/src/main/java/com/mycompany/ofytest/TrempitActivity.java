@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
+import com.example.ilay.myapplication.backend.trempitApi.model.Passenger;
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
 import com.example.ilay.myapplication.backend.trempitApi.model.Event;
 import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
@@ -23,10 +25,12 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -143,6 +147,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         }
 
         // added here so the currentUser location will be loaded from GPS before storing in datastore
+        //TODO: handle activity recreation (e.g. rotation of screen) - don't create new objects
         new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -162,6 +167,10 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         googleApiClient.connect();
     }
 
+    public void buildTestData(View view) {
+        new BuildTestEndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
      class EndpointsAsyncTask extends AsyncTask<Void, Void, List<Event>> {
         private  TrempitApi myApiService = null;
         private Context context;
@@ -178,7 +187,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
                         // options for running against local devappserver
                         // - 10.0.2.2 is localhost's IP address in Android emulator
                         // - turn off compression when running against local devappserver
-                        .setRootUrl("http://10.0.0.10:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
                             public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
@@ -220,5 +229,112 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
 
 
         }
+    }
+
+
+    class BuildTestEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
+        private  TrempitApi myApiService = null;
+        private Context context;
+
+        BuildTestEndpointsAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if(myApiService == null) {  // Only do this once
+                TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        }).setApplicationName("Trempit");
+                // end options for devappserver
+
+                myApiService = builder.build();
+            }
+
+            try {
+                com.example.ilay.myapplication.backend.trempitApi.model.Location location1 = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
+                location1.setId((long) 1);
+                location1.setCity("Tel Aviv");
+                location1.setStreet("Ben Yehuda");
+                com.example.ilay.myapplication.backend.trempitApi.model.Location location2 = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
+                location2.setId((long) 2);
+                location2.setCity("Tel Aviv");
+                location2.setStreet("Dizengoff");
+                com.example.ilay.myapplication.backend.trempitApi.model.Location location3 = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
+                location3.setId((long) 3);
+                location3.setCity("Petah Tikva");
+                location3.setStreet("Gordon");
+
+                Event event1 = new Event();
+                event1.setId((long) 1);
+                event1.setTitle("Birthday");
+                event1.setLocation(location1);
+                Date date1 = new Date(115, 3, 29, 19, 0);
+                DateTime dateTime1 = new DateTime(date1);
+                event1.setStartTime(dateTime1);
+
+                Event event2 = new Event();
+                event2.setId((long) 2);
+                event2.setTitle("Wedding");
+                event2.setLocation(location2);
+                Date date2 = new Date(115, 4, 3, 20, 30);
+                DateTime dateTime2 = new DateTime(date2);
+                event1.setStartTime(dateTime2);
+
+                TrempitUser trempitUser1 = new TrempitUser();
+                trempitUser1.setId((long) 1);
+                trempitUser1.setFullName("Eran Katz");
+                trempitUser1.setHomeLocation(location3);
+
+                TrempitUser trempitUser2 = new TrempitUser();
+                trempitUser2.setId((long) 2);
+                trempitUser2.setFullName("Mahatma Gandhi");
+                trempitUser2.setHomeLocation(location1);
+
+                Passenger passenger1 = new Passenger();
+                passenger1.setFullName(trempitUser1.getFullName());
+                passenger1.setId((long) 10);
+                passenger1.setStartingLocation(trempitUser1.getHomeLocation());
+                //passenger1.setEvent(event1);
+
+                Driver driver1 = new Driver();
+                driver1.setId((long) 20);
+                driver1.setFullName(trempitUser2.getFullName());
+                driver1.setStartingLocation(trempitUser2.getHomeLocation());
+                //driver1.setEvent(event1);
+                Date date3 = new Date(115, 3, 29, 19, 30); //fashionably late
+                DateTime dateTime3 = new DateTime(date3);
+                driver1.setArrivalTime(dateTime3);
+
+                myApiService.insertLocation(location1).execute();
+                myApiService.insertLocation(location2).execute();
+                myApiService.insertLocation(location3).execute();
+                myApiService.insertEvent(event1).execute();
+                myApiService.insertEvent(event2).execute();
+                myApiService.insertTrempitUser(trempitUser1).execute();
+                myApiService.insertTrempitUser(trempitUser2).execute();
+                myApiService.insertPassenger(passenger1).execute();
+                myApiService.addPassengerToEvent((long)2, (long)10).execute();
+                myApiService.insertDriver(driver1).execute();
+                myApiService.addDriverToEvent((long)20, (long)2).execute();
+
+
+
+            } catch (IOException e) {
+                Log.d("Trempit", "IO error");
+            }
+
+            return null;
+        }
+
+
     }
 }

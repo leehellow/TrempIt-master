@@ -29,7 +29,7 @@ public class DriverAdapter extends ArrayAdapter<Driver> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_driver, parent, false);
         }
         Button button = (Button) convertView.findViewById(R.id.driverButton);
-        button.setText(driver.getFullName());
+        button.setText(driver.getFullName() + " " + driver.getStartingLocation().getCity());
         button.setTag(driver);
 
         return convertView;

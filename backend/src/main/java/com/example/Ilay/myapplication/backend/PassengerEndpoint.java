@@ -79,6 +79,13 @@ public class PassengerEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+
         ofy().save().entity(passenger).now();
         logger.info("Created Passenger with ID: " + passenger.getId());
 

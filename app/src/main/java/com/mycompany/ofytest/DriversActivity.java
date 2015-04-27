@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
 import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
 import com.example.ilay.myapplication.backend.trempitApi.model.Event;
+import com.example.ilay.myapplication.backend.trempitApi.model.Location;
 import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -107,7 +108,7 @@ public class DriversActivity extends ActionBarActivity{
                         // options for running against local devappserver
                         // - 10.0.2.2 is localhost's IP address in Android emulator
                         // - turn off compression when running against local devappserver
-                        .setRootUrl("http://10.0.0.10:8080/_ah/api/").setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
                             public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
@@ -122,6 +123,11 @@ public class DriversActivity extends ActionBarActivity{
                 Driver driver = new Driver();
                 driver.setFullName("Eran Nahag");
                 driver.setId((long) 10000);
+                Location location = new Location();
+                location.setId((long) 1000);
+                location.setCity("Tel Aviv");
+                location.setStreet("Dizengoff");
+                driver.setStartingLocation(location);
                 myApiService.insertDriver(driver).execute();
                 myApiService.addDriverToEvent(driver.getId(), eventId).execute();
                 return myApiService.listEventDrivers(eventId).execute().getItems();
