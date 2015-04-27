@@ -159,12 +159,12 @@ public class DriverProfileActivity extends ActionBarActivity {
         private TrempitApi myApiService = null;
         private Context context;
 
-        EndpointsAsyncTask(Context context) {
+        RequestEndpointsAsyncTask(Context context) {
             this.context = context;
         }
 
         @Override
-        protected Driver doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {
             if(myApiService == null) {  // Only do this once
                 TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
@@ -183,50 +183,22 @@ public class DriverProfileActivity extends ActionBarActivity {
             }
 
             try {
-                return myApiService.getDriver(driverId).execute();
+                //TODO: figure out how to extract passenger id from trempitUser id: serverside or clientside
+                myApiService.addPassengerRequest(driver.getId(), currentUser.getPassengerList().get(0).getId());
+                return null;
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
                 return null;
             }
         }
 
-        @Override
-        protected void onPostExecute(Driver result) {
-//            for (Event q : result) {
-//                List<Passenger> passlist= q.getPassengerList();
-//                Toast.makeText(context, passlist.get(0).getFullName() + " : " + q.getTitle(), Toast.LENGTH_LONG).show();
-//
-//            }
-            if (result == null || result.isEmpty()) {
-                Log.d("TrempIt", "No driver retrieved");
-                return;
-            }
 
-            driver = result;
 
-            TextView username = (TextView) findViewById(R.id.username);
-            username.setText(driver.getFullName());
-
-            TextView availableSeats = (TextView) findViewById(R.id.availableSeats);
-            int numberOfPassengers;
-            if (driver.getPassengerList() == null) {
-                numberOfPassengers = 0;
-            }
-            else {
-                numberOfPassengers = driver.getPassengerList().size();
-            }
-            int numberOfSeats = driver.getAvailableSeats() - numberOfPassengers;
-            availableSeats.setText("available seats: " + numberOfSeats);
-
-            TextView startingLocation = (TextView) findViewById(R.id.startingLocation);
-            startingLocation.setText(driver.getStartingLocation().getStreet() + ", " + driver.getStartingLocation().getCity());
-
-            TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-            arrivalTime.setText(result.getArrivalTime().toStringRfc3339());
 
 
         }
     }
 
-}
+
+
 
