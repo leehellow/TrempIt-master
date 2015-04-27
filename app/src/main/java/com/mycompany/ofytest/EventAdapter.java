@@ -28,7 +28,8 @@ public class EventAdapter extends ArrayAdapter<Event> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_event, parent, false);
         }
         Button button = (Button) convertView.findViewById(R.id.eventButton);
-        button.setText(event.getTitle());
+        button.setTransformationMethod(null);
+        button.setText(event.getTitle() + "\n" + event.getStartTime().toStringRfc3339() + "\n" + event.getLocation().getStreet() + ", " + event.getLocation().getCity());
         button.setTag(event);
 
         return convertView;

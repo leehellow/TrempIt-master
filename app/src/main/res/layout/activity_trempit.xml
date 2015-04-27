@@ -7,19 +7,27 @@
     <ListView
         android:id="@+id/eventlistview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button2"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Build Test Data"
         android:id="@+id/button"
-        android:layout_alignTop="@+id/eventlistview"
-        android:layout_alignRight="@+id/eventlistview"
-        android:layout_alignEnd="@+id/eventlistview"
-        android:layout_marginRight="38dp"
-        android:layout_marginEnd="38dp"
-        android:layout_marginTop="93dp"
-        android:onClick="buildTestData" />
+        android:onClick="buildTestData"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/button2"
+        android:layout_alignStart="@+id/button2"
+        android:layout_marginBottom="53dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:id="@+id/button2"
+        android:layout_alignParentTop="true"
+        android:onClick="refreshActivity" />
 
 </RelativeLayout>

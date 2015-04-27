@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
@@ -40,24 +39,32 @@ public class DriversActivity extends ActionBarActivity{
     TrempitUser currentUser;
     Long eventId;
 
+    GlobalState globalState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drivers);
 
+        globalState = (GlobalState) getApplicationContext();
+        currentUser = globalState.getCurrentUser();
+
         Intent intent = getIntent();
-        long currUserId = (long) intent.getSerializableExtra("user");
-        eventId = (long) intent.getSerializableExtra("event");
-        Log.d("TrempIt", String.valueOf(currUserId));
+        eventId = (Long) intent.getLongExtra("event", -1);
+        Log.d("TrempIt", String.valueOf(currentUser.getId()));
 
         driverAdapter  = new DriverAdapter(this, drivers);
         //driverAdapter.add(new Driver());
-        new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
+        refreshActivity(findViewById(R.id.button));
 
         final ListView listView = (ListView) findViewById(R.id.driverlistview);
         Log.d("TrempIt", listView.toString());
         listView.setAdapter(driverAdapter);
 
+    }
+
+    public void refreshActivity(View view) {
+        new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -86,10 +93,9 @@ public class DriversActivity extends ActionBarActivity{
     public void startDriverActivity(View view) {
         Driver driver = (Driver) view.getTag();
         Log.d("TrempIt", "Driver name: " + driver.getFullName());
-//        Intent intent = new Intent(this, DriversActivity.class);
-//        intent.putExtra("user", currentUser.getId());//TODO: what is the first parameter for?
-//        intent.putExtra("event", event.getId());
-//        startActivity(intent);
+        Intent intent = new Intent(this, DriverProfileActivity.class);
+        intent.putExtra("driverid", driver.getId());
+        startActivity(intent);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Void, Void, List<Driver>> {
@@ -128,8 +134,8 @@ public class DriversActivity extends ActionBarActivity{
                 location.setCity("Tel Aviv");
                 location.setStreet("Dizengoff");
                 driver.setStartingLocation(location);
-                myApiService.insertDriver(driver).execute();
-                myApiService.addDriverToEvent(driver.getId(), eventId).execute();
+                //myApiService.insertDriver(driver).execute();
+                //myApiService.addDriverToEvent(driver.getId(), eventId).execute();
                 return myApiService.listEventDrivers(eventId).execute().getItems();
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
@@ -150,6 +156,7 @@ public class DriversActivity extends ActionBarActivity{
                 return;
             }
 
+            driverAdapter.clear();
             driverAdapter.addAll(result);
             Log.d("TrempIt", "after post");
             driverAdapter.notifyDataSetChanged();

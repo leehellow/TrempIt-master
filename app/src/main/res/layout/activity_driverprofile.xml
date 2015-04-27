@@ -2,26 +2,51 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/AvailableSeats"
+    <Button
+        android:id="@+id/requestButton"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:text="@string/number_of_available_seats"/>
-
-
-    <TextView
-        android:id="@+id/availableSeatsNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/AvailableSeats"
-        android:text=""/>
+        android:layout_alignParentTop="true"
+        android:text="Send request"
+        android:onClick="sendRequest"
+        />
 
     <TextView
-        android:id="@+id/ArrivalTime"
+        android:id="@+id/username"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:text="@string/arrival_time" />
+        android:layout_above="@+id/availableSeats"
+        android:layout_centerHorizontal="true"
+        android:textSize="31sp"
+        android:text="username"/>
+
+    <TextView
+        android:id="@id/availableSeats"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="31sp"
+        android:text="available seats"/>
+
+    <TextView
+        android:id="@+id/startingLocation"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/availableSeats"
+        android:layout_centerHorizontal="true"
+        android:textSize="31sp"
+        android:text="starting location" />
+
+    <TextView
+        android:id="@+id/arrivalTime"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/startingLocation"
+        android:layout_centerHorizontal="true"
+        android:textSize="31sp"
+        android:text="arrival time" />
+
+
 
 </RelativeLayout>

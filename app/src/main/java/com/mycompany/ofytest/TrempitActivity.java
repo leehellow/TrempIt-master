@@ -3,7 +3,6 @@ package com.mycompany.ofytest;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.media.browse.MediaBrowser;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -38,6 +37,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
     ArrayList<Event> events = new ArrayList<>();
     EventAdapter eventAdapter;
     TrempitUser currentUser = new TrempitUser();
+    GlobalState globalState;
 
     /**
      * Provides the entry point to Google Play services.
@@ -60,7 +60,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
 
         eventAdapter = new EventAdapter(this, events);
 
-
+        globalState = (GlobalState) getApplicationContext();
 
 
         final ListView listView = (ListView) findViewById(R.id.eventlistview);
@@ -89,6 +89,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
             return true;
         }
 
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -96,7 +97,8 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         Event event = (Event) view.getTag();
         Log.d("TrempIt", "Event title: " + event.getTitle());
         Intent intent = new Intent(this, DriversActivity.class);
-        intent.putExtra("user", currentUser.getId());//TODO: what is the first parameter for?
+        globalState.setCurrentUser(currentUser);
+//        intent.putExtra("user", currentUser.getId());//TODO: what is the first parameter for?
         intent.putExtra("event", event.getId());
         startActivity(intent);
     }
@@ -148,6 +150,10 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
 
         // added here so the currentUser location will be loaded from GPS before storing in datastore
         //TODO: handle activity recreation (e.g. rotation of screen) - don't create new objects
+        refreshActivity((View) findViewById(R.id.action_settings));
+    }
+
+    public void refreshActivity(View view) {
         new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -220,6 +226,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
                 return;
             }
 
+            eventAdapter.clear();
             eventAdapter.addAll(result);
             Log.d("TrempIt", "after post");
             eventAdapter.notifyDataSetChanged();
@@ -287,7 +294,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
                 event2.setLocation(location2);
                 Date date2 = new Date(115, 4, 3, 20, 30);
                 DateTime dateTime2 = new DateTime(date2);
-                event1.setStartTime(dateTime2);
+                event2.setStartTime(dateTime2);
 
                 TrempitUser trempitUser1 = new TrempitUser();
                 trempitUser1.setId((long) 1);
