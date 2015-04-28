@@ -14,9 +14,11 @@
         <activity android:name=".DriversActivity"
             android:screenOrientation="portrait"
             android:label="Drivers"/>
-        <activity android:name=".EventsActivity"
+        <activity android:name=".HarelTestActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".EventsActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".DriverProfileActivity"
             android:screenOrientation="portrait"/>

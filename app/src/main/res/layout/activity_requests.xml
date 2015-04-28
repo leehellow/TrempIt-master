@@ -3,20 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/refreshButton"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:onClick="refreshActivity"
+        android:text="Refresh"/>
+
     <ListView
         android:id="@+id/requestlistview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/button2"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
-        android:text="Refresh"
-        android:id="@+id/button2"
-        android:layout_alignParentTop="true"
-        android:onClick="refreshActivity" />
+        android:layout_below="@id/refreshButton"/>
 
 
 </RelativeLayout>

@@ -31,14 +31,13 @@ public class TrempitUser {
         this.homeLocation = homeLocation;
     }
 
-    /**
-    public List<Passenger> getPendingPassengers(){
-        List<Passenger> pendingPassengers = new ArrayList<Passenger>();
-        for(Driver driver : driverList)
-            for(Passenger passenger : driver.pendingPassengerList)
-                pendingPassengers.add(passenger);
-        return pendingPassengers;
-    }**/
+//    public List<Passenger> getPendingPassengers(){
+//        List<Passenger> pendingPassengers = new ArrayList<Passenger>();
+//        for(Driver driver : driverList)
+//            for(Passenger passenger : driver.pendingPassengerList)
+//                pendingPassengers.add(passenger);
+//        return pendingPassengers;
+//    }
 
     public Long getId() {
         return id;

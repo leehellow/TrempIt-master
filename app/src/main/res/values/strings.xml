@@ -21,4 +21,5 @@
 
     <string name="number_of_available_seats">Number of available seats:</string>
     <string name="arrival_time">Arrival time:</string>
+    <string name="title_activity_trempit">TrempitActivity</string>
 </resources>

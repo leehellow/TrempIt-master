@@ -23,7 +23,7 @@ public class MainActivity extends ActionBarActivity {
     public void login(View view){
 
         TextView error = (TextView) findViewById(R.id.loginError);
-        Intent intent = new Intent(this, EventsActivity.class);
+        Intent intent = new Intent(this, HarelTestActivity.class);
         String username = ((TextView) findViewById(R.id.loginUsername)).getText().toString();
 
         if (username == null){
@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trempit);
+        setContentView(R.layout.activity_events);
         userList = new HashMap<String,TrempitUser>();
         TextView error = (TextView) findViewById(R.id.signupError);
         error.setText("Button was not clicked");

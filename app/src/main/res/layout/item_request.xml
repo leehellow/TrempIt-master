@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text = "A passenger wants to join your ride to somewhere"/>
+        android:text = "(name) wants to join your ride from (location) to (event)"/>
 
     <Button
         android:id="@+id/approveButton"

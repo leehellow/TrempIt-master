@@ -172,6 +172,23 @@ public class TrempitUserEndpoint {
         return CollectionResponse.<TrempitUser>builder().setItems(trempitUserList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
+    /**
+     * List all entities.
+     *
+     * @param trempitUserId used for pagination to determine which page to return
+     * @return a response that encapsulates the result list and the next page token/cursor
+     */
+    @ApiMethod(
+            name = "listPendingPassengers",
+            path = "pendingPassengers",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public CollectionResponse<Passenger> listPendingPassengers(@Named("TrempitUserId") Long trempitUserId) throws NotFoundException {
+        EndpointUtils.checkTrempitUserExists(trempitUserId);
+        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempitUserId).now();
+        List<Passenger> passengerList = trempitUser.getPassengerList();
+        return CollectionResponse.<Passenger>builder().setItems(passengerList).build();
+    }
+
     private void checkExists(Long id) throws NotFoundException {
         try {
             ofy().load().type(TrempitUser.class).id(id).safe();
