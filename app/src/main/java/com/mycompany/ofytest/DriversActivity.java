@@ -95,6 +95,8 @@ public class DriversActivity extends ActionBarActivity{
         Log.d("TrempIt", "Driver name: " + driver.getFullName());
         Intent intent = new Intent(this, DriverProfileActivity.class);
         intent.putExtra("driverid", driver.getId());
+        intent.putExtra("eventid", eventId);
+        Log.d("TrempIt", "DriversActivity " + String.valueOf(eventId));
         startActivity(intent);
     }
 

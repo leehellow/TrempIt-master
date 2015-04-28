@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
 import com.example.ilay.myapplication.backend.trempitApi.model.Event;
@@ -37,6 +38,7 @@ import java.util.List;
 public class DriverProfileActivity extends ActionBarActivity {
 
     long driverId;
+    long eventId;
     Driver driver;
 
     TrempitUser currentUser;
@@ -51,6 +53,7 @@ public class DriverProfileActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         driverId = (long) intent.getLongExtra("driverid", -1);
+        eventId = (long) intent.getLongExtra("eventid", -1);
         Log.d("TrempIt", String.valueOf(driverId));
         currentUser = globalState.getCurrentUser();
         displayDriverData();
@@ -78,6 +81,7 @@ public class DriverProfileActivity extends ActionBarActivity {
     }
 
     public void sendRequest(View view) {
+        Log.d("TrempIt", "DriversProfileActivity " + String.valueOf(eventId));
         new RequestEndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -184,14 +188,20 @@ public class DriverProfileActivity extends ActionBarActivity {
 
             try {
                 //TODO: figure out how to extract passenger id from trempitUser id: serverside or clientside
-                myApiService.addPassengerRequest(driver.getId(), currentUser.getPassengerList().get(0).getId());
+                Log.d("TrempIt", "RequestAsyncTask " + String.valueOf(eventId));
+                myApiService.addPassengerRequest(driver.getId(), eventId, currentUser.getId()).execute();
                 return null;
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
                 return null;
             }
+
         }
 
+        @Override
+        protected void onPostExecute(Void v) {
+            Toast.makeText(context, "Request sent to driver!", Toast.LENGTH_LONG).show();
+        }
 
 
 

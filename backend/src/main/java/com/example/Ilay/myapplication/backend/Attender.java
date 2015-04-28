@@ -5,6 +5,7 @@ import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Load;
 
 /**
  * Created by Ilay on 20/4/2015.
@@ -16,6 +17,7 @@ public abstract class Attender {
     Long id;
     Ref<TrempitUser> trempitUser; // comment
     @JsonBackReference(value = "event-driver-list")
+    @Load
     Ref<Event> event;
     String fullName;
     Location startingLocation;

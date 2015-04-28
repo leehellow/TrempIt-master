@@ -8,6 +8,7 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -189,15 +190,43 @@ public class DriverEndpoint {
             name = "addPassengerRequest",
             path = "driver/addRequest",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addRequest(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {
+    public void addRequest(@Named("driverid") Long driverid, @Named("trempituserid") Long trempituserid, @Named("eventid") Long eventid) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         EndpointUtils.checkDriverExists(driverid);
-        EndpointUtils.checkPassengerExists(passengerid);
+        EndpointUtils.checkTrempitUserExists(trempituserid);
+        EndpointUtils.checkEventExists(eventid);
         Driver driver = ofy().load().type(Driver.class).id(driverid).now();
-        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
-        driver.addPassengerToPendingPassengerList(passenger);
+        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempituserid).now();
+        Event event = ofy().load().type(Event.class).id(eventid).now();
+        List<Passenger> passengerList = trempitUser.getPassengerList();
+
+        Passenger eventPassenger = null; // the passenger object for the event
+
+        for (Passenger passenger: passengerList) {
+            if (passenger.getEvent().getId() == eventid) {
+                eventPassenger = passenger;
+            }
+        }
+
+        if (eventPassenger == null) {
+            eventPassenger = new Passenger();
+            eventPassenger.setId(trempitUser.getId());
+            eventPassenger.setFullName(trempitUser.getFullName());
+            eventPassenger.setEvent(event);
+            eventPassenger.setStartingLocation(trempitUser.getHomeLocation());
+            eventPassenger.setTrempitUser(trempitUser);
+
+            ofy().save().entity(eventPassenger).now();
+            event.addPassenger(eventPassenger);
+            ofy().save().entity(event).now();
+        }
+
+
+
+
+        driver.addPassengerToPendingPassengerList(eventPassenger);
         ofy().save().entity(driver).now();
-        logger.info("Added passenger : " + passengerid + " to driver: " + driverid + "pending list");
+        logger.info("Added passenger : " + eventPassenger.getId() + " to driver: " + driverid + "pending list");
     }
 
     private void checkExists(Long id) throws NotFoundException {

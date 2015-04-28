@@ -55,4 +55,13 @@ public final class EndpointUtils {
         }
 
     }
+
+    public static void checkTrempitUserExists(Long id) throws NotFoundException {
+        try {
+            ofy().load().type(TrempitUser.class).id(id).safe();
+        } catch (com.googlecode.objectify.NotFoundException e) {
+            throw new NotFoundException("Could not find TrempitUser with ID: " + id);
+        }
+
+    }
 }

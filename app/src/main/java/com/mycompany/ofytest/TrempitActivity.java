@@ -36,7 +36,7 @@ import java.util.List;
 public class TrempitActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     ArrayList<Event> events = new ArrayList<>();
     EventAdapter eventAdapter;
-    TrempitUser currentUser = new TrempitUser();
+    TrempitUser currentUser;
     GlobalState globalState;
 
     /**
@@ -55,8 +55,8 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         setContentView(R.layout.activity_trempit);
         buildGoogleApiClient();
 
-        currentUser.setFullName("Eran Katz");
-        currentUser.setId((long) 1000);
+//        currentUser.setFullName("Eran Katz");
+//        currentUser.setId((long) 1000);
 
         eventAdapter = new EventAdapter(this, events);
 
@@ -100,6 +100,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
         globalState.setCurrentUser(currentUser);
 //        intent.putExtra("user", currentUser.getId());//TODO: what is the first parameter for?
         intent.putExtra("event", event.getId());
+        Log.d("TrempIt", "TrempitActivity " + String.valueOf(event.getId()));
         startActivity(intent);
     }
 
@@ -143,7 +144,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
             location.setLatitude((float) lastLocation.getLatitude());
             location.setLongitude((float) lastLocation.getLongitude());
             location.setId((long) 1000);
-            currentUser.setHomeLocation(location);
+            //currentUser.setHomeLocation(location);
         } else {
             Log.d("TrempIt", "could not find location");
         }
@@ -205,8 +206,8 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
             }
 
             try {
-                myApiService.insertLocation(currentUser.getHomeLocation()).execute();
-                myApiService.insertTrempitUser(currentUser).execute();
+                //myApiService.insertLocation(currentUser.getHomeLocation()).execute();
+                //myApiService.insertTrempitUser(currentUser).execute();
                 return myApiService.listEvents().execute().getItems();
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
@@ -300,6 +301,7 @@ public class TrempitActivity extends ActionBarActivity implements GoogleApiClien
                 trempitUser1.setId((long) 1);
                 trempitUser1.setFullName("Eran Katz");
                 trempitUser1.setHomeLocation(location3);
+                currentUser = trempitUser1;
 
                 TrempitUser trempitUser2 = new TrempitUser();
                 trempitUser2.setId((long) 2);
