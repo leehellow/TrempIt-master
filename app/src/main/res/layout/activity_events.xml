@@ -12,17 +12,6 @@
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Build Test Data"
-        android:id="@+id/button"
-        android:onClick="buildTestData"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/button2"
-        android:layout_alignStart="@+id/button2"
-        android:layout_marginBottom="53dp" />
-
-    <Button
-        android:layout_width="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_height="wrap_content"
         android:text="Refresh"

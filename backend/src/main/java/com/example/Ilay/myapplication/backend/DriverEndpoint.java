@@ -8,7 +8,6 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -74,13 +73,17 @@ public class DriverEndpoint {
             name = "insertDriver",
             path = "driver",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Driver insert(Driver driver) {
+    public Driver insert(Driver driver, @Named("trempituserId") Long trempituserId) throws NotFoundException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that driver.id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+        EndpointUtils.checkTrempitUserExists(trempituserId);
+        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempituserId).now();
+        trempitUser.addDriverToUser(driver);
         ofy().save().entity(driver).now();
+        ofy().save().entity(trempitUser).now();
         logger.info("Created Driver with ID: " + driver.getId());
 
         return ofy().load().entity(driver).now();
@@ -180,8 +183,8 @@ public class DriverEndpoint {
     /**
      * Updates an existing {@code Driver}.
      *
-     * @param id     the ID of the entity to be updated
-     * @param driver the desired state of the entity
+     * @param trempituserid     the ID of the entity to be updated
+     * @param eventid the desired state of the entity
      * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Driver}

@@ -127,8 +127,7 @@ public class TrempitUserEndpoint {
     /**
      * Updates an existing {@code TrempitUser}.
      *
-     * @param id          the ID of the entity to be updated
-     * @param trempitUser the desired state of the entity
+     * @param PassengerId      the ID of the entity to be updated
      * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code TrempitUser}
@@ -185,7 +184,13 @@ public class TrempitUserEndpoint {
     public CollectionResponse<Passenger> listPendingPassengers(@Named("TrempitUserId") Long trempitUserId) throws NotFoundException {
         EndpointUtils.checkTrempitUserExists(trempitUserId);
         TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempitUserId).now();
-        List<Passenger> passengerList = trempitUser.getPassengerList();
+        List<Driver> drivelList = trempitUser.getDriverList();
+        List<Passenger> passengerList =  new ArrayList<>();
+
+        for (Driver driver: drivelList) {
+            passengerList.addAll(driver.getPendingPassengerList());
+        }
+
         return CollectionResponse.<Passenger>builder().setItems(passengerList).build();
     }
 

@@ -45,17 +45,17 @@ public class DriversActivity extends ActionBarActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drivers);
-        //
+
         globalState = (GlobalState) getApplicationContext();
         currentUser = globalState.getCurrentUser();
 
         Intent intent = getIntent();
         eventId = (Long) intent.getLongExtra("event", -1);
-        Log.d("TrempIt", String.valueOf(currentUser.getId()));
+        //Log.d("TrempIt", String.valueOf(currentUser.getId()));
 
         driverAdapter  = new DriverAdapter(this, drivers);
         //driverAdapter.add(new Driver());
-        refreshActivity(findViewById(R.id.button));
+        refreshActivity(findViewById(R.id.requestlistview));
 
         final ListView listView = (ListView) findViewById(R.id.driverlistview);
         Log.d("TrempIt", listView.toString());

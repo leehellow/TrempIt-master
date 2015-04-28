@@ -31,8 +31,8 @@ public class RequestAdapter extends ArrayAdapter<Passenger> {
         }
 
         String username = passenger.getFullName();
-        String location = passenger.getStartingLocation().getCity() + passenger.getStartingLocation().getStreet();
-        String event = passenger.getEvent().getTitle();
+        String location = passenger.getStartingLocation().getStreet() + ", " + passenger.getStartingLocation().getCity();
+        String event = "Wedding";
 
         Button aprroveButton = (Button) convertView.findViewById(R.id.approveButton);
         Button declineButton = (Button) convertView.findViewById(R.id.declineButton);

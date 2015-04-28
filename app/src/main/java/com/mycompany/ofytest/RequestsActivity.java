@@ -42,7 +42,7 @@ public class RequestsActivity extends ActionBarActivity {
         final ListView listView = (ListView) findViewById(R.id.requestlistview);
         listView.setAdapter(requestAdapter);
 
-        refreshActivity(findViewById(R.id.button));
+        refreshActivity(findViewById(R.id.requestlistview));
     }
 
     public void approveRequest(View view){
@@ -91,7 +91,7 @@ public class RequestsActivity extends ActionBarActivity {
             try {
                 //myApiService.insertLocation(currentUser.getHomeLocation()).execute();
                 //myApiService.insertTrempitUser(currentUser).execute();
-                return myApiService.listPendingPassengers(currentUser.getId()).execute().getItems();
+                return myApiService.listPendingPassengers((long) 2).execute().getItems();
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
                 return Collections.EMPTY_LIST;

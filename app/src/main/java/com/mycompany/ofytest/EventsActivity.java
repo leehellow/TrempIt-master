@@ -145,7 +145,18 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
 
         // added here so the currentUser location will be loaded from GPS before storing in datastore
         //TODO: handle activity recreation (e.g. rotation of screen) - don't create new objects
+
         refreshActivity((View) findViewById(R.id.action_settings));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (globalState.getCurrentUser() == null) {
+            buildTestData((View) findViewById(R.id.eventlistview));
+        }
+
     }
 
     public void refreshActivity(View view) {
@@ -322,7 +333,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 myApiService.insertTrempitUser(trempitUser2).execute();
                 myApiService.insertPassenger(passenger1).execute();
                 myApiService.addPassengerToEvent((long)2, (long)10).execute();
-                myApiService.insertDriver(driver1).execute();
+                myApiService.insertDriver(trempitUser2.getId(), driver1).execute();
                 myApiService.addDriverToEvent((long)20, (long)2).execute();
 
 
