@@ -15,7 +15,7 @@ import com.googlecode.objectify.ObjectifyService;
 public class OfyService {
 
     static {
-        factory().register(Quote.class);
+
     }
 
     public static Objectify ofy() {

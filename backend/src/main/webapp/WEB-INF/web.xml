@@ -13,8 +13,7 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.example.Ilay.myapplication.backend.MyEndpoint,
-                com.example.Ilay.myapplication.backend.QuoteEndpoint,
+            <param-value>
                 com.example.Ilay.myapplication.backend.AttenderEndpoint,
                 com.example.Ilay.myapplication.backend.EventEndpoint,
                 com.example.Ilay.myapplication.backend.LocationEndpoint,
