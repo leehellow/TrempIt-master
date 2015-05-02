@@ -100,7 +100,7 @@ public class TrempitUserEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public TrempitUser update(@Named("id") Long id, TrempitUser trempitUser) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        EndpointUtils.checkTrempitUserExists(id);
         ofy().save().entity(trempitUser).now();
         logger.info("Updated TrempitUser: " + trempitUser);
         return ofy().load().entity(trempitUser).now();
@@ -118,7 +118,7 @@ public class TrempitUserEndpoint {
             path = "trempitUser/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
+        EndpointUtils.checkTrempitUserExists(id);
         ofy().delete().type(TrempitUser.class).id(id).now();
         logger.info("Deleted TrempitUser with ID: " + id);
     }
@@ -137,7 +137,7 @@ public class TrempitUserEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void addPassengerToUser(@Named("TrempitUserId") Long TrempitUserId, @Named("PassengerId") Long PassengerId) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(TrempitUserId);
+        EndpointUtils.checkTrempitUserExists(TrempitUserId);
         TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(TrempitUserId).now();
         Passenger passenger = ofy().load().type(Passenger.class).id(PassengerId).now();
         trempitUser.addPassengerToUser(passenger);
@@ -191,13 +191,5 @@ public class TrempitUserEndpoint {
         }
 
         return CollectionResponse.<Passenger>builder().setItems(passengerList).build();
-    }
-
-    private void checkExists(Long id) throws NotFoundException {
-        try {
-            ofy().load().type(TrempitUser.class).id(id).safe();
-        } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find TrempitUser with ID: " + id);
-        }
     }
 }

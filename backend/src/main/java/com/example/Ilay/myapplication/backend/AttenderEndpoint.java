@@ -54,7 +54,7 @@ public class AttenderEndpoint {
      * @throws NotFoundException if there is no {@code Attender} with the provided ID.
      */
     @ApiMethod(
-            name = "get",
+            name = "getAttender",
             path = "attender/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Attender get(@Named("id") Long id) throws NotFoundException {
@@ -70,7 +70,7 @@ public class AttenderEndpoint {
      * Inserts a new {@code Attender}.
      */
     @ApiMethod(
-            name = "insert",
+            name = "insertAttender",
             path = "attender",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Attender insert(Attender attender) {
@@ -95,12 +95,12 @@ public class AttenderEndpoint {
      *                           {@code Attender}
      */
     @ApiMethod(
-            name = "update",
+            name = "updateAttender",
             path = "attender/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Attender update(@Named("id") Long id, Attender attender) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        EndpointUtils.checkAttenderExists(id);
         ofy().save().entity(attender).now();
         logger.info("Updated Attender: " + attender);
         return ofy().load().entity(attender).now();
@@ -114,11 +114,11 @@ public class AttenderEndpoint {
      *                           {@code Attender}
      */
     @ApiMethod(
-            name = "remove",
+            name = "removeAttender",
             path = "attender/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
+        EndpointUtils.checkAttenderExists(id);
         ofy().delete().type(Attender.class).id(id).now();
         logger.info("Deleted Attender with ID: " + id);
     }
@@ -131,7 +131,7 @@ public class AttenderEndpoint {
      * @return a response that encapsulates the result list and the next page token/cursor
      */
     @ApiMethod(
-            name = "list",
+            name = "listAttenders",
             path = "attender",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Attender> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
@@ -148,11 +148,5 @@ public class AttenderEndpoint {
         return CollectionResponse.<Attender>builder().setItems(attenderList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
-    private void checkExists(Long id) throws NotFoundException {
-        try {
-            ofy().load().type(Attender.class).id(id).safe();
-        } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find Attender with ID: " + id);
-        }
-    }
+
 }

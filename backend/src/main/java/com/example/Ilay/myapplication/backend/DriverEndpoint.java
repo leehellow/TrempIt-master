@@ -104,7 +104,7 @@ public class DriverEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Driver update(@Named("id") Long id, Driver driver) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        EndpointUtils.checkDriverExists(id);
         ofy().save().entity(driver).now();
         logger.info("Updated Driver: " + driver);
         return ofy().load().entity(driver).now();
@@ -122,7 +122,7 @@ public class DriverEndpoint {
             path = "driver/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
+        EndpointUtils.checkDriverExists(id);
         ofy().delete().type(Driver.class).id(id).now();
         logger.info("Deleted Driver with ID: " + id);
     }
@@ -230,11 +230,5 @@ public class DriverEndpoint {
         logger.info("Added passenger : " + eventPassenger.getId() + " to driver: " + driverid + "pending list");
     }
 
-    private void checkExists(Long id) throws NotFoundException {
-        try {
-            ofy().load().type(Driver.class).id(id).safe();
-        } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find Driver with ID: " + id);
-        }
-    }
+
 }

@@ -100,7 +100,7 @@ public class LocationEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Location update(@Named("id") Long id, Location location) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        EndpointUtils.checkLocationExists(id);
         ofy().save().entity(location).now();
         logger.info("Updated Location: " + location);
         return ofy().load().entity(location).now();
@@ -118,7 +118,7 @@ public class LocationEndpoint {
             path = "location/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
+        EndpointUtils.checkLocationExists(id);
         ofy().delete().type(Location.class).id(id).now();
         logger.info("Deleted Location with ID: " + id);
     }
@@ -148,11 +148,5 @@ public class LocationEndpoint {
         return CollectionResponse.<Location>builder().setItems(locationList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
-    private void checkExists(Long id) throws NotFoundException {
-        try {
-            ofy().load().type(Location.class).id(id).safe();
-        } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find Location with ID: " + id);
-        }
-    }
+
 }

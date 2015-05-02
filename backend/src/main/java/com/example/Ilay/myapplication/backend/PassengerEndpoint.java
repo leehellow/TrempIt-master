@@ -107,7 +107,7 @@ public class PassengerEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Passenger update(@Named("id") Long id, Passenger passenger) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        EndpointUtils.checkPassengerExists(id);
         ofy().save().entity(passenger).now();
         logger.info("Updated Passenger: " + passenger);
         return ofy().load().entity(passenger).now();
@@ -125,7 +125,7 @@ public class PassengerEndpoint {
             path = "passenger/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
+        EndpointUtils.checkPassengerExists(id);
         ofy().delete().type(Passenger.class).id(id).now();
         logger.info("Deleted Passenger with ID: " + id);
     }
@@ -155,11 +155,5 @@ public class PassengerEndpoint {
         return CollectionResponse.<Passenger>builder().setItems(passengerList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
-    private void checkExists(Long id) throws NotFoundException {
-        try {
-            ofy().load().type(Passenger.class).id(id).safe();
-        } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find Passenger with ID: " + id);
-        }
-    }
+
 }

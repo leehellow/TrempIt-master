@@ -60,4 +60,22 @@ public final class EndpointUtils {
         }
 
     }
+
+    public static void checkLocationExists(Long id) throws NotFoundException {
+        try {
+            ofy().load().type(Location.class).id(id).safe();
+        } catch (com.googlecode.objectify.NotFoundException e) {
+            throw new NotFoundException("Could not find TrempitUser with ID: " + id);
+        }
+
+    }
+
+    public static void checkAttenderExists(Long id) throws NotFoundException {
+        try {
+            ofy().load().type(Attender.class).id(id).safe();
+        } catch (com.googlecode.objectify.NotFoundException e) {
+            throw new NotFoundException("Could not find TrempitUser with ID: " + id);
+        }
+
+    }
 }
