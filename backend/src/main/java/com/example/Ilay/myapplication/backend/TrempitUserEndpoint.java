@@ -128,7 +128,6 @@ public class TrempitUserEndpoint {
      * Updates an existing {@code TrempitUser}.
      *
      * @param PassengerId      the ID of the entity to be updated
-     * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code TrempitUser}
      */
@@ -164,7 +163,7 @@ public class TrempitUserEndpoint {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<TrempitUser> queryIterator = query.iterator();
-        List<TrempitUser> trempitUserList = new ArrayList<TrempitUser>(limit);
+        List<TrempitUser> trempitUserList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             trempitUserList.add(queryIterator.next());
         }

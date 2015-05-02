@@ -21,14 +21,12 @@ public class Event {
     Date startTime;
     Location location;
     String title;
-    @JsonManagedReference(value = "event-driver-list")
+    @JsonManagedReference(value = "event_attender_list")
     List<Ref<Driver>> driverList = new ArrayList<>();
-    @JsonManagedReference(value = "event-driver-list")
+    @JsonManagedReference(value = "event_attender_list")
     List<Ref<Passenger>> passengerList = new ArrayList<>();
-    //Map<Driver, List<Passenger>> pendingPassengers; //TODO: use Driver as key or driverid?
 
     public Event() {
-        //this.id = new Long(1);
     }
 
     public Event(Date startTime, Location location, String title) {

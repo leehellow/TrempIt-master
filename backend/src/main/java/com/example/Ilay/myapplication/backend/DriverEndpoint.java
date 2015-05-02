@@ -145,7 +145,7 @@ public class DriverEndpoint {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<Driver> queryIterator = query.iterator();
-        List<Driver> driverList = new ArrayList<Driver>(limit);
+        List<Driver> driverList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             driverList.add(queryIterator.next());
         }
@@ -157,7 +157,6 @@ public class DriverEndpoint {
      *
      * @param passengerid     the ID of the entity to be updated
      * @param driverid the desired state of the entity
-     * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Driver}
      */
@@ -185,7 +184,6 @@ public class DriverEndpoint {
      *
      * @param trempituserid     the ID of the entity to be updated
      * @param eventid the desired state of the entity
-     * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Driver}
      */
@@ -206,7 +204,7 @@ public class DriverEndpoint {
         Passenger eventPassenger = null; // the passenger object for the event
 
         for (Passenger passenger: passengerList) {
-            if (passenger.getEvent().getId() == eventid) {
+            if (passenger.getEvent().getId().equals(eventid)) {
                 eventPassenger = passenger;
             }
         }

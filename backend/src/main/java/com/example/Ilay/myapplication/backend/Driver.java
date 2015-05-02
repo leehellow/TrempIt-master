@@ -16,13 +16,9 @@ import java.util.List;
 public class Driver extends Attender {
     int availableSeats;
     Date arrivalTime;
-    @JsonManagedReference(value = "driver-passenger-list")
+    @JsonManagedReference(value = "driver_passenger_list")
     List<Ref<Passenger>> passengerList = new ArrayList<>();
-    //@JsonManagedReference(value = "driver-pendingpassenger-list")
     List<Ref<Passenger>> pendingPassengerList = new ArrayList<>();
-
-
-    //eran katz!!!!!
 
     public Driver() {
         super();

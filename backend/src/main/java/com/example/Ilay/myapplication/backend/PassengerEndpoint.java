@@ -148,7 +148,7 @@ public class PassengerEndpoint {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<Passenger> queryIterator = query.iterator();
-        List<Passenger> passengerList = new ArrayList<Passenger>(limit);
+        List<Passenger> passengerList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             passengerList.add(queryIterator.next());
         }

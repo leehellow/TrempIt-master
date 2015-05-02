@@ -25,11 +25,7 @@ public final class EndpointUtils {
             Event event1;
             try {
                 event1 = ofy().load().entity(event).now();
-                if (event1 == null) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return event1 == null;
             }
             catch (Exception e) {
                 return true;

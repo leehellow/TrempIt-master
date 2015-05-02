@@ -141,7 +141,7 @@ public class AttenderEndpoint {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<Attender> queryIterator = query.iterator();
-        List<Attender> attenderList = new ArrayList<Attender>(limit);
+        List<Attender> attenderList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             attenderList.add(queryIterator.next());
         }

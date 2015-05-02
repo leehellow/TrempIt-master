@@ -9,7 +9,7 @@ import com.googlecode.objectify.annotation.Subclass;
  */
 @Subclass(index = true)
 public class Passenger extends Attender {
-    @JsonBackReference(value = "driver-passenger-list")
+    @JsonBackReference(value = "driver_passenger_list")
     Ref<Driver> driver;
 
     public Passenger() {

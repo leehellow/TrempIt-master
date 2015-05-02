@@ -1,7 +1,6 @@
 package com.example.Ilay.myapplication.backend;
 
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonBackReference;
-import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -15,8 +14,8 @@ import com.googlecode.objectify.annotation.Load;
 public abstract class Attender {
     @Id
     Long id;
-    Ref<TrempitUser> trempitUser; // comment
-    @JsonBackReference(value = "event-driver-list")
+    Ref<TrempitUser> trempitUser;
+    @JsonBackReference(value = "event_attender_list")
     @Load
     Ref<Event> event;
     String fullName;

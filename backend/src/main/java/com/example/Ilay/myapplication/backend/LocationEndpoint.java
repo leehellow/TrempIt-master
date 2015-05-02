@@ -141,7 +141,7 @@ public class LocationEndpoint {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<Location> queryIterator = query.iterator();
-        List<Location> locationList = new ArrayList<Location>(limit);
+        List<Location> locationList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             locationList.add(queryIterator.next());
         }
