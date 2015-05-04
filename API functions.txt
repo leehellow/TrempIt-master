@@ -1,0 +1,25 @@
+//Event
+insertEvent(Event event) - creates the event
+getEvent(Long id)
+removeEvent(Long id)
+
+//Passenger
+addPassengerToEvent(Long eventId, Long trempitUserId, Passenger passenger) - creates the passenger object if not already exists, and adds to the passengerList of the trempitUser
+getPassenger(Long id)
+removePassenger(Long id) - also removes the passenger from the event passengerList, and the trempitUser passengerList
+listEventPassengers(Long id) - lists the passengerList
+
+//Driver
+addDriverToEvent(Long eventId, Long trempitUserId, Driver driver) - creates the driver object if not already exists, and adds to the driverList of the trempitUser
+getDriver(Long id)
+removeDriver(Long id) - also removes the driver from the event driverList, and the trempitUser driverList
+listEventDrivers(Long id) - lists the driverList
+addPassengerRequest(Long driverId, Long passengerId) - adds a passenger to the driver pendingPassengerList
+approvePassengerRequest(Long driverId, Long passengerId) - removes a passenger from the driver pendingPassengerList and adds to the passengerList
+ignorePassengerRequest(Long driverId, Long passengerId) - removes a passenger from the driver pendingPassengerList
+
+//TrempitUser
+insertTrempitUser(TrempitUser trempitUser)
+removeTrempitUser(Long id) - also removes the passenger and driver objects
+listTrempitUserPassengers(Long id) - lists the user passengerList
+listTrempitUserDrivers(Long id) - lists the user driverList
