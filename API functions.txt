@@ -15,8 +15,9 @@ getDriver(Long id)
 removeDriver(Long id) - also removes the driver from the event driverList, and the trempitUser driverList
 listEventDrivers(Long id) - lists the driverList
 addPassengerRequest(Long driverId, Long passengerId) - adds a passenger to the driver pendingPassengerList
-approvePassengerRequest(Long driverId, Long passengerId) - removes a passenger from the driver pendingPassengerList and adds to the passengerList
+approvePassengerRequest(Long driverId, Long passengerId) - removes a passenger from the driver pendingPassengerList and adds to the passengerList. also adds the passenger to the user
 ignorePassengerRequest(Long driverId, Long passengerId) - removes a passenger from the driver pendingPassengerList
+removePassengerFromDriver(Long driverId, Long passengerId) - 
 
 //TrempitUser
 insertTrempitUser(TrempitUser trempitUser)

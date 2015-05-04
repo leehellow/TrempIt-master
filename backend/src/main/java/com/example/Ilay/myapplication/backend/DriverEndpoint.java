@@ -197,24 +197,24 @@ public class DriverEndpoint {
 
         Passenger eventPassenger = null; // the passenger object for the event
 
-        for (Passenger passenger: passengerList) {
-            if (passenger.getEvent().getId().equals(eventid)) {
-                eventPassenger = passenger;
-            }
-        }
-
-        if (eventPassenger == null) {
-            eventPassenger = new Passenger();
-            eventPassenger.setId(trempitUser.getId());
-            eventPassenger.setFullName(trempitUser.getFullName());
-            eventPassenger.setEvent(event);
-            eventPassenger.setStartingLocation(trempitUser.getHomeLocation());
-            eventPassenger.setTrempitUser(trempitUser);
-
-            ofy().save().entity(eventPassenger).now();
-            event.addPassenger(eventPassenger);
-            ofy().save().entity(event).now();
-        }
+//        for (Passenger passenger: passengerList) {
+//            if (passenger.getEvent().getId().equals(eventid)) {
+//                eventPassenger = passenger;
+//            }
+//        }
+//
+//        if (eventPassenger == null) {
+//            eventPassenger = new Passenger();
+//            eventPassenger.setId(trempitUser.getId());
+//            eventPassenger.setFullName(trempitUser.getFullName());
+//            eventPassenger.setEvent(event);
+//            eventPassenger.setStartingLocation(trempitUser.getHomeLocation());
+//            eventPassenger.setTrempitUser(trempitUser);
+//
+//            ofy().save().entity(eventPassenger).now();
+//            event.addPassenger(eventPassenger);
+//            ofy().save().entity(event).now();
+//        }
 
 
 
