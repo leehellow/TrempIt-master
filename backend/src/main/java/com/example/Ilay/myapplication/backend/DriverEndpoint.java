@@ -66,14 +66,8 @@ public class DriverEndpoint {
         return driver;
     }
 
-    /**
-     * Inserts a new {@code Driver}.
-     */
-    @ApiMethod(
-            name = "insertDriver",
-            path = "driver",
-            httpMethod = ApiMethod.HttpMethod.POST)
-    public Driver insert(Driver driver, @Named("trempituserId") Long trempituserId) throws NotFoundException {
+
+    private Driver insert(Driver driver, @Named("trempituserId") Long trempituserId) throws NotFoundException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that driver.id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
@@ -123,22 +117,22 @@ public class DriverEndpoint {
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
         EndpointUtils.checkDriverExists(id);
+        Driver driver = ofy().load().type(Driver.class).id(id).now();
+        TrempitUser trempitUser = driver.getTrempitUser();
+        Event event = driver.getEvent();
+
+        trempitUser.removeDriverFromUser(driver);
+        event.removeDriver(driver);
+
+        ofy().save().entity(driver.getTrempitUser()).now();
+        ofy().save().entity(driver.getEvent()).now();
+
         ofy().delete().type(Driver.class).id(id).now();
         logger.info("Deleted Driver with ID: " + id);
     }
 
-    /**
-     * List all entities.
-     *
-     * @param cursor used for pagination to determine which page to return
-     * @param limit  the maximum number of entries to return
-     * @return a response that encapsulates the result list and the next page token/cursor
-     */
-    @ApiMethod(
-            name = "listDrivers",
-            path = "driver",
-            httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Driver> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
+
+    private CollectionResponse<Driver> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Driver> query = ofy().load().type(Driver.class).limit(limit);
         if (cursor != null) {
@@ -183,7 +177,7 @@ public class DriverEndpoint {
      * Updates an existing {@code Driver}.
      *
      * @param trempituserid     the ID of the entity to be updated
-     * @param eventid the desired state of the entity
+     * @param driverid the desired state of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Driver}
      */
@@ -191,14 +185,14 @@ public class DriverEndpoint {
             name = "addPassengerRequest",
             path = "driver/addRequest",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addRequest(@Named("driverid") Long driverid, @Named("trempituserid") Long trempituserid, @Named("eventid") Long eventid) throws NotFoundException {
+    public void addRequest(@Named("driverid") Long driverid, @Named("trempituserid") Long trempituserid, @Named("passengerid") Long passengerid) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         EndpointUtils.checkDriverExists(driverid);
         EndpointUtils.checkTrempitUserExists(trempituserid);
-        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkPassengerExists(passengerid);
         Driver driver = ofy().load().type(Driver.class).id(driverid).now();
         TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempituserid).now();
-        Event event = ofy().load().type(Event.class).id(eventid).now();
+        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
         List<Passenger> passengerList = trempitUser.getPassengerList();
 
         Passenger eventPassenger = null; // the passenger object for the event
@@ -229,6 +223,52 @@ public class DriverEndpoint {
         ofy().save().entity(driver).now();
         logger.info("Added passenger : " + eventPassenger.getId() + " to driver: " + driverid + "pending list");
     }
+
+
+
+    /**
+     * List all entities.
+     *
+     * @return a response that encapsulates the result list and the next page token/cursor
+     */
+    @ApiMethod(
+            name = "listEventDrivers",
+            path = "event/listDrivers",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public CollectionResponse<Driver> listEventDrivers(@Named("id") Long id) throws NotFoundException {
+        EndpointUtils.checkEventExists(id);
+        Event event = ofy().load().type(Event.class).id(id).now();
+        List<Driver> eventDriverList = event.getDriverList();
+        return CollectionResponse.<Driver>builder().setItems(eventDriverList).build();
+    }
+
+
+    /**
+     * Deletes the specified {@code Event}.
+     *
+     * @param eventid the ID of the entity to delete
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code Event}
+     */
+    @ApiMethod(
+            name = "addDriverToEvent",
+            path = "event/addDriver",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void addDriver(@Named("eventid") Long eventid, @Named("trempituserid") Long trempitUserId, Driver driver) throws NotFoundException {
+        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkTrempitUserExists(trempitUserId);
+        Event event = ofy().load().type(Event.class).id(eventid).now();
+        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempitUserId).now();
+        event.addDriver(driver);
+        driver.setEvent(event);
+        driver.setTrempitUser(trempitUser);
+        trempitUser.addDriverToUser(driver);
+        ofy().save().entity(event).now();
+        ofy().save().entity(driver).now();
+        ofy().save().entity(trempitUser).now();
+        logger.info("Added driver: " + driver.getId() + "to event: " + eventid);
+    }
+
 
 
 }

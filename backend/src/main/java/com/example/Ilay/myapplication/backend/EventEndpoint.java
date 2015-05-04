@@ -131,96 +131,6 @@ public class EventEndpoint {
     }
 
     /**
-     * Deletes the specified {@code Event}.
-     *
-     * @param eventid the ID of the entity to delete
-     * @throws NotFoundException if the {@code id} does not correspond to an existing
-     *                           {@code Event}
-     */
-    @ApiMethod(
-            name = "addPassengerToEvent",
-            path = "event/addPassenger",
-            httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addPassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
-        EndpointUtils.checkEventExists(eventid);
-        EndpointUtils.checkPassengerExists(passengerid);
-        Event event = ofy().load().type(Event.class).id(eventid).now();
-        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
-        event.addPassenger(passenger);
-        passenger.setEvent(event);
-        ofy().save().entity(event).now();
-        ofy().save().entity(passenger).now();
-        logger.info("Added passenger: " + passengerid + "to event: " + eventid);
-    }
-
-    /**
-     * Deletes the specified {@code Event}.
-     *
-     * @param eventid the ID of the entity to delete
-     * @throws NotFoundException if the {@code id} does not correspond to an existing
-     *                           {@code Event}
-     */
-    @ApiMethod(
-            name = "removePassengerFromEvent",
-            path = "event/removePassenger",
-            httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void removePassenger(@Named("eventid") Long eventid, @Named("passengerid") Long passengerid) throws NotFoundException {
-        EndpointUtils.checkEventExists(eventid);
-        EndpointUtils.checkPassengerExists(passengerid);
-        Event event = ofy().load().type(Event.class).id(eventid).now();
-        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
-        event.removePassenger(passenger);
-        ofy().save().entity(event).now();
-        ofy().delete().entity(passenger);
-        logger.info("Removed passenger: " + passengerid + "from event: " + eventid);
-    }
-
-    /**
-     * Deletes the specified {@code Event}.
-     *
-     * @param eventid the ID of the entity to delete
-     * @throws NotFoundException if the {@code id} does not correspond to an existing
-     *                           {@code Event}
-     */
-    @ApiMethod(
-            name = "addDriverToEvent",
-            path = "event/addDriver",
-            httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
-        EndpointUtils.checkEventExists(eventid);
-        EndpointUtils.checkDriverExists(driverid);
-        Event event = ofy().load().type(Event.class).id(eventid).now();
-        Driver driver = ofy().load().type(Driver.class).id(driverid).now();
-        event.addDriver(driver);
-        driver.setEvent(event);
-        ofy().save().entity(event).now();
-        ofy().save().entity(driver).now();
-        logger.info("Added driver: " + driverid + "to event: " + eventid);
-    }
-
-    /**
-     * Deletes the specified {@code Event}.
-     *
-     * @param eventid the ID of the entity to delete
-     * @throws NotFoundException if the {@code id} does not correspond to an existing
-     *                           {@code Event}
-     */
-    @ApiMethod(
-            name = "removeDriverFromEvent",
-            path = "event/removeDriver",
-            httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void removeDriver(@Named("eventid") Long eventid, @Named("driverid") Long driverid) throws NotFoundException {
-        EndpointUtils.checkEventExists(eventid);
-        EndpointUtils.checkDriverExists(driverid);
-        Event event = ofy().load().type(Event.class).id(eventid).now();
-        Driver driver = ofy().load().type(Driver.class).id(driverid).now();
-        event.removeDriver(driver);
-        ofy().save().entity(event).now();
-        ofy().delete().entity(driver);
-        logger.info("Removed driver: " + driverid + "from event: " + eventid);
-    }
-
-    /**
      * List all entities.
      *
      * @param cursor used for pagination to determine which page to return
@@ -245,37 +155,9 @@ public class EventEndpoint {
         return CollectionResponse.<Event>builder().setItems(eventList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
-    /**
-     * List all entities.
-     *
-     * @return a response that encapsulates the result list and the next page token/cursor
-     */
-    @ApiMethod(
-            name = "listEventPassengers",
-            path = "event/listPassengers",
-            httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Passenger> listEventPassengers(@Named("id") Long id) throws NotFoundException {
-        EndpointUtils.checkEventExists(id);
-        Event event = ofy().load().type(Event.class).id(id).now();
-        List<Passenger> eventPassengerList = event.getPassengerList();
-        return CollectionResponse.<Passenger>builder().setItems(eventPassengerList).build();
-    }
 
-    /**
-     * List all entities.
-     *
-     * @return a response that encapsulates the result list and the next page token/cursor
-     */
-    @ApiMethod(
-            name = "listEventDrivers",
-            path = "event/listDrivers",
-            httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Driver> listEventDrivers(@Named("id") Long id) throws NotFoundException {
-        EndpointUtils.checkEventExists(id);
-        Event event = ofy().load().type(Event.class).id(id).now();
-        List<Driver> eventDriverList = event.getDriverList();
-        return CollectionResponse.<Driver>builder().setItems(eventDriverList).build();
-    }
+
+
 
 
 }
