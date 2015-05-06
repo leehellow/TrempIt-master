@@ -159,7 +159,6 @@ public class DriverEndpoint {
             path = "driver/approveRequest",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void approveRequest(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {
-        // TODO: You should validate your ID parameter against your resource's ID here.
         EndpointUtils.checkDriverExists(driverid);
         EndpointUtils.checkPassengerExists(passengerid);
         Driver driver = ofy().load().type(Driver.class).id(driverid).now();
@@ -176,7 +175,7 @@ public class DriverEndpoint {
     /**
      * Updates an existing {@code Driver}.
      *
-     * @param trempituserid     the ID of the entity to be updated
+     * @param passengerid     the ID of the entity to be updated
      * @param driverid the desired state of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Driver}
@@ -185,46 +184,63 @@ public class DriverEndpoint {
             name = "addPassengerRequest",
             path = "driver/addRequest",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void addRequest(@Named("driverid") Long driverid, @Named("trempituserid") Long trempituserid, @Named("passengerid") Long passengerid) throws NotFoundException {
+    public void addRequest(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         EndpointUtils.checkDriverExists(driverid);
-        EndpointUtils.checkTrempitUserExists(trempituserid);
         EndpointUtils.checkPassengerExists(passengerid);
         Driver driver = ofy().load().type(Driver.class).id(driverid).now();
-        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempituserid).now();
         Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
-        List<Passenger> passengerList = trempitUser.getPassengerList();
-
-        Passenger eventPassenger = null; // the passenger object for the event
-
-//        for (Passenger passenger: passengerList) {
-//            if (passenger.getEvent().getId().equals(eventid)) {
-//                eventPassenger = passenger;
-//            }
-//        }
-//
-//        if (eventPassenger == null) {
-//            eventPassenger = new Passenger();
-//            eventPassenger.setId(trempitUser.getId());
-//            eventPassenger.setFullName(trempitUser.getFullName());
-//            eventPassenger.setEvent(event);
-//            eventPassenger.setStartingLocation(trempitUser.getHomeLocation());
-//            eventPassenger.setTrempitUser(trempitUser);
-//
-//            ofy().save().entity(eventPassenger).now();
-//            event.addPassenger(eventPassenger);
-//            ofy().save().entity(event).now();
-//        }
-
-
-
-
-        driver.addPassengerToPendingPassengerList(eventPassenger);
+        driver.addPassengerToPendingPassengerList(passenger);
         ofy().save().entity(driver).now();
-        logger.info("Added passenger : " + eventPassenger.getId() + " to driver: " + driverid + "pending list");
+        logger.info("Added passenger : " + passenger.getId() + " to driver: " + driverid + "pending list");
     }
 
 
+    /**
+     * Updates an existing {@code Driver}.
+     *
+     * @param passengerid     the ID of the entity to be updated
+     * @param driverid the desired state of the entity
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code Driver}
+     */
+    @ApiMethod(
+            name = "ignorePassengerRequest",
+            path = "driver/ignoreRequest",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void ignoreRequest(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {
+        EndpointUtils.checkDriverExists(driverid);
+        EndpointUtils.checkPassengerExists(passengerid);
+        Driver driver = ofy().load().type(Driver.class).id(driverid).now();
+        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
+        driver.removePassengerFromPendingPassengerList(passenger);
+
+        ofy().save().entity(driver).now();
+        logger.info("ignored passenger: " + passengerid + " to driver: " + driverid);
+    }
+
+    /**
+     * Updates an existing {@code Driver}.
+     *
+     * @param passengerid     the ID of the entity to be updated
+     * @param driverid the desired state of the entity
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code Driver}
+     */
+    @ApiMethod(
+            name = "removePassengerFromDriver",
+            path = "driver/removePassenger",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void removePassengerFromDriver(@Named("driverid") Long driverid, @Named("passengerid") Long passengerid) throws NotFoundException {
+        EndpointUtils.checkDriverExists(driverid);
+        EndpointUtils.checkPassengerExists(passengerid);
+        Driver driver = ofy().load().type(Driver.class).id(driverid).now();
+        Passenger passenger = ofy().load().type(Passenger.class).id(passengerid).now();
+        driver.removePassengerFromPassengerList(passenger);
+
+        ofy().save().entity(driver).now();
+        logger.info("ignored passenger: " + passengerid + " to driver: " + driverid);
+    }
 
     /**
      * List all entities.

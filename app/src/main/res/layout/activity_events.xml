@@ -24,10 +24,9 @@
         android:layout_height="wrap_content"
         android:text="test data"
         android:id="@+id/button"
-        android:layout_marginBottom="137dp"
         android:onClick="buildTestData"
-        android:layout_alignBottom="@+id/eventlistview"
-        android:layout_toRightOf="@+id/button2"
-        android:layout_toEndOf="@+id/button2" />
+        android:layout_above="@+id/eventlistview"
+        android:layout_alignRight="@+id/eventlistview"
+        android:layout_alignEnd="@+id/eventlistview" />
 
 </RelativeLayout>

@@ -189,7 +189,7 @@ public class DriverProfileActivity extends ActionBarActivity {
             try {
                 //TODO: figure out how to extract passenger id from trempitUser id: serverside or clientside
                 Log.d("TrempIt", "RequestAsyncTask " + String.valueOf(eventId));
-                myApiService.addPassengerRequest(driver.getId(), eventId, currentUser.getId()).execute();
+                myApiService.addPassengerRequest(driver.getId(), currentUser.getPassengerList().get(0).getId()).execute();
                 return null;
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
