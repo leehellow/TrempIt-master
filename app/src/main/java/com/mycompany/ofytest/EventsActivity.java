@@ -3,20 +3,24 @@ package com.mycompany.ofytest;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
-import com.example.ilay.myapplication.backend.trempitApi.model.Passenger;
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
+import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
 import com.example.ilay.myapplication.backend.trempitApi.model.Event;
+import com.example.ilay.myapplication.backend.trempitApi.model.Passenger;
 import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -26,7 +30,13 @@ import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.util.DateTime;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -55,18 +65,16 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         setContentView(R.layout.activity_events);
         buildGoogleApiClient();
 
-//        currentUser.setFullName("Eran Katz");
-//        currentUser.setId((long) 1000);
 
         eventAdapter = new EventAdapter(this, events);
 
         globalState = (GlobalState) getApplicationContext();
 
-
         final ListView listView = (ListView) findViewById(R.id.eventlistview);
         listView.setAdapter(eventAdapter);
 
-
+        createEventFromUrl("https://www.facebook.com/events/636118563156949/");
+        Log.d("Trempit", "after add facebook");
     }
 
 
@@ -239,6 +247,126 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         }
     }
 
+    private void createEventFromUrl(String urlString) {
+        long eventId = parseUrlToId(urlString);
+        addFacebookEvent(eventId);
+    }
+
+    private long parseUrlToId(String urlString) {
+        Uri uri = null;
+        uri = Uri.parse(urlString);
+        String idString = uri.getLastPathSegment();
+        return Long.valueOf(idString);
+    }
+
+    private void addFacebookEvent(long eventId) {
+        // initialize the the objects
+        final Event event =  new Event();
+        event.setId(eventId);
+        com.example.ilay.myapplication.backend.trempitApi.model.Location location = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
+
+        // add parameters for the facebook request
+        Bundle params = new Bundle();
+        params.putString("fields","place,description,name,start_time");
+
+        Log.d("Trempit", "before request");
+        // building the graph request using the event id
+        GraphRequest request = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
+                String.valueOf(eventId),
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse graphResponse) {
+                        Log.v("Trempit", graphResponse.toString());
+
+
+                        try {
+
+                            // update the event fields using the JSON object from the graph response
+                            JSONObject eventJSON = graphResponse.getJSONObject();
+                            updateEventFromJson(eventJSON, event);
+                            Log.v("Trempit", event.getTitle());
+                            Log.v("Trempit", event.getLocation().getStreet());
+                            Log.v("Trempit", event.getStartTime().toString());
+
+                            // add the event to the event list, and update the listview
+                            // TODO: add the event object to the datastore
+                            events.add(event);
+                            eventAdapter.add(event);
+                            eventAdapter.notifyDataSetChanged();
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+        // executing the request
+        request.setParameters(params);
+        request.executeAsync();
+    }
+
+    // updates the relevant fields of the Event object from a graph request JSON object
+    private void updateEventFromJson(JSONObject eventJSON, Event event) throws JSONException, ParseException {
+        String eventName;
+        DateTime eventStartTime;
+        com.example.ilay.myapplication.backend.trempitApi.model.Location eventLocation = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
+        JSONObject placeJSON;
+
+        eventName = eventJSON.getString("name");
+
+        placeJSON = eventJSON.getJSONObject("place");
+        eventLocation = updateLocationFromJson(placeJSON, eventLocation);
+
+        eventStartTime = dateTimeFromJsonString(eventJSON.getString("start_time"));
+
+        event.setTitle(eventName);
+        event.setLocation(eventLocation);
+        event.setStartTime(eventStartTime);
+
+    }
+
+    private com.example.ilay.myapplication.backend.trempitApi.model.Location updateLocationFromJson(JSONObject placeJSON, com.example.ilay.myapplication.backend.trempitApi.model.Location location) throws JSONException {
+        // get the location object inside the place object (facebook graph api)
+        JSONObject locationJSON = placeJSON.getJSONObject("location");
+
+        location.setLongitude((float) locationJSON.getDouble("longitude"));
+        location.setLongitude((float) locationJSON.getDouble("latitude"));
+        location.setCountry(locationJSON.getString("country"));
+        location.setCity(locationJSON.getString("city"));
+        location.setStreet(locationJSON.getString("street"));
+        location.setName(placeJSON.getString("name"));
+
+        return location;
+    }
+
+    // parses the date string from the JSON graph request
+    // from: http://stackoverflow.com/a/18217193
+    private DateTime dateTimeFromJsonString(String dateString) {
+        Date date = null;
+        DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        DateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+
+        // facebook apparently uses more than one datetime format
+        try {
+            date = dateFormat1.parse(dateString);
+        } catch (ParseException e) {
+            try {
+                date = dateFormat2.parse(dateString);
+            } catch (ParseException f) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+        return new DateTime(date);
+    }
 
     class BuildTestEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
         private  TrempitApi myApiService = null;
@@ -302,7 +430,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 trempitUser1.setFullName("Eran Katz");
                 trempitUser1.setHomeLocation(location3);
                 currentUser = trempitUser1;
-                globalState.setCurrentUser(currentUser);
+                //globalState.setCurrentUser(currentUser);
 
                 TrempitUser trempitUser2 = new TrempitUser();
                 trempitUser2.setId((long) 2);

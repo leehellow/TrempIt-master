@@ -22,4 +22,7 @@
     <string name="number_of_available_seats">Number of available seats:</string>
     <string name="arrival_time">Arrival time:</string>
     <string name="title_activity_trempit">TrempitActivity</string>
+    
+    
+    <string name="facebook_app_id">906742579381804</string>
 </resources>
