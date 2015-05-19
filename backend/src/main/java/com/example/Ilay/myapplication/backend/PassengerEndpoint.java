@@ -66,25 +66,12 @@ public class PassengerEndpoint {
         return passenger;
     }
 
-    /**
-     * Inserts a new {@code Passenger}.
-     */
-    @ApiMethod(
-            name = "insertPassenger",
-            path = "passenger",
-            httpMethod = ApiMethod.HttpMethod.POST)
-    public Passenger insert(Passenger passenger) {
+    private Passenger insert(Passenger passenger) {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that passenger.id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-
-        try {
-            Thread.sleep(1000);                 //1000 milliseconds is one second.
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
 
         ofy().save().entity(passenger).now();
         logger.info("Created Passenger with ID: " + passenger.getId());
@@ -126,22 +113,22 @@ public class PassengerEndpoint {
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException {
         EndpointUtils.checkPassengerExists(id);
+        Passenger passenger = ofy().load().type(Passenger.class).id(id).now();
+        TrempitUser trempitUser = passenger.getTrempitUser();
+        Event event = passenger.getEvent();
+
+        trempitUser.removePassengerFromUser(passenger);
+        event.removePassenger(passenger);
+
+        ofy().save().entity(passenger.getTrempitUser()).now();
+        ofy().save().entity(passenger.getEvent()).now();
+
         ofy().delete().type(Passenger.class).id(id).now();
         logger.info("Deleted Passenger with ID: " + id);
     }
 
-    /**
-     * List all entities.
-     *
-     * @param cursor used for pagination to determine which page to return
-     * @param limit  the maximum number of entries to return
-     * @return a response that encapsulates the result list and the next page token/cursor
-     */
-    @ApiMethod(
-            name = "listPassengers",
-            path = "passenger",
-            httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Passenger> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
+
+    private CollectionResponse<Passenger> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Passenger> query = ofy().load().type(Passenger.class).limit(limit);
         if (cursor != null) {
@@ -155,5 +142,42 @@ public class PassengerEndpoint {
         return CollectionResponse.<Passenger>builder().setItems(passengerList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
+
+
+    @ApiMethod(
+            name = "addPassengerToEvent",
+            path = "event/addPassengerToEvent",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void addPassengerToEvent(@Named("eventid") Long eventid, @Named("trempituserid") Long trempitUserId, Passenger passenger) throws NotFoundException {
+        EndpointUtils.checkEventExists(eventid);
+        EndpointUtils.checkTrempitUserExists(trempitUserId);
+        Event event = ofy().load().type(Event.class).id(eventid).now();
+        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(trempitUserId).now();
+        event.addPassenger(passenger);
+        passenger.setEvent(event);
+        passenger.setTrempitUser(trempitUser);
+        trempitUser.addPassengerToUser(passenger);
+        ofy().save().entity(event).now();
+        ofy().save().entity(passenger).now();
+        ofy().save().entity(trempitUser).now();
+        logger.info("Added passenger: " + passenger.getId() + "to event: " + eventid);
+    }
+
+
+    /**
+     * List all entities.
+     *
+     * @return a response that encapsulates the result list and the next page token/cursor
+     */
+    @ApiMethod(
+            name = "listEventPassengers",
+            path = "event/listPassengers",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public CollectionResponse<Passenger> listEventPassengers(@Named("id") Long id) throws NotFoundException {
+        EndpointUtils.checkEventExists(id);
+        Event event = ofy().load().type(Event.class).id(id).now();
+        List<Passenger> eventPassengerList = event.getPassengerList();
+        return CollectionResponse.<Passenger>builder().setItems(eventPassengerList).build();
+    }
 
 }

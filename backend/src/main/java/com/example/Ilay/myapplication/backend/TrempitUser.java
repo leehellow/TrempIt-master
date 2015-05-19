@@ -1,5 +1,6 @@
 package com.example.Ilay.myapplication.backend;
 
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonManagedReference;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -19,7 +20,9 @@ public class TrempitUser {
     Long id;
     String fullName;
     Location homeLocation;
+    @JsonManagedReference(value = "trempitUser")
     List<Ref<Passenger>> passengerList = new ArrayList<>(); // a different Attender object for each Event
+    @JsonManagedReference(value = "trempitUser")
     List<Ref<Driver>> driverList = new ArrayList<>();
 
     public TrempitUser() {
@@ -104,10 +107,19 @@ public class TrempitUser {
         passengerList.add(passengerRef);
     }
 
+    public void removePassengerFromUser(Passenger passenger) {
+        Ref<Passenger> passengerRef = Ref.create(passenger);
+        passengerList.remove(passengerRef);
+    }
+
     public void addDriverToUser(Driver newDriver){
         Ref<Driver> driverRef = Ref.create(newDriver);
         driverList.add(driverRef);
     }
 
+    public void removeDriverFromUser(Driver driver) {
+        Ref<Driver> driverRef = Ref.create(driver);
+        driverList.remove(driverRef);
+    }
 
 }

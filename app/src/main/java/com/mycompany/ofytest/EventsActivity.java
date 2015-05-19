@@ -154,7 +154,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         }
 
         if (globalState.getCurrentUser() == null) {
-            buildTestData((View) findViewById(R.id.eventlistview));
+            //buildTestData((View) findViewById(R.id.eventlistview));
         }
 
     }
@@ -323,6 +323,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 Date date3 = new Date(115, 3, 29, 19, 30); //fashionably late
                 DateTime dateTime3 = new DateTime(date3);
                 driver1.setArrivalTime(dateTime3);
+                driver1.setAvailableSeats(4);
 
                 myApiService.insertLocation(location1).execute();
                 myApiService.insertLocation(location2).execute();
@@ -331,10 +332,8 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 myApiService.insertEvent(event2).execute();
                 myApiService.insertTrempitUser(trempitUser1).execute();
                 myApiService.insertTrempitUser(trempitUser2).execute();
-                myApiService.insertPassenger(passenger1).execute();
-                myApiService.addPassengerToEvent((long)2, (long)10).execute();
-                myApiService.insertDriver(trempitUser2.getId(), driver1).execute();
-                myApiService.addDriverToEvent((long)20, (long)2).execute();
+                myApiService.addPassengerToEvent(event1.getId(), trempitUser1.getId(), passenger1).execute();
+                myApiService.addDriverToEvent(event1.getId(), trempitUser2.getId(), driver1).execute();
 
 
 
