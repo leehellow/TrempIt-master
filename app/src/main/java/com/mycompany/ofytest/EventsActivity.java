@@ -278,31 +278,18 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                     public void onCompleted(GraphResponse graphResponse) {
                         Log.v("Trempit", graphResponse.toString());
 
+                        // update the event fields using the JSON object from the graph response
+                        JSONObject eventJSON = graphResponse.getJSONObject();
+                        updateEventFromJson(eventJSON, event);
+                        Log.v("Trempit", event.getTitle());
+                        Log.v("Trempit", event.getLocation().getLatitude().toString());
+                        Log.v("Trempit", event.getStartTime().toString());
 
-                        try {
-
-                            // update the event fields using the JSON object from the graph response
-                            JSONObject eventJSON = graphResponse.getJSONObject();
-                            updateEventFromJson(eventJSON, event);
-                            Log.v("Trempit", event.getTitle());
-                            Log.v("Trempit", event.getLocation().getStreet());
-                            Log.v("Trempit", event.getStartTime().toString());
-
-                            // add the event to the event list, and update the listview
-                            // TODO: add the event object to the datastore
-                            events.add(event);
-                            eventAdapter.add(event);
-                            eventAdapter.notifyDataSetChanged();
-
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
-
+                        // add the event to the event list, and update the listview
+                        // TODO: add the event object to the datastore
+                        events.add(event);
+                        eventAdapter.add(event);
+                        eventAdapter.notifyDataSetChanged();
                     }
                 });
 
@@ -312,18 +299,31 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
     }
 
     // updates the relevant fields of the Event object from a graph request JSON object
-    private void updateEventFromJson(JSONObject eventJSON, Event event) throws JSONException, ParseException {
+    private void updateEventFromJson(JSONObject eventJSON, Event event) {
         String eventName;
         DateTime eventStartTime;
         com.example.ilay.myapplication.backend.trempitApi.model.Location eventLocation = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
         JSONObject placeJSON;
 
-        eventName = eventJSON.getString("name");
+        try {
+            eventName = eventJSON.getString("name");
+        } catch (JSONException e) {
+            eventName = null;
+        }
 
-        placeJSON = eventJSON.getJSONObject("place");
-        eventLocation = updateLocationFromJson(placeJSON, eventLocation);
+        try {
+            placeJSON = eventJSON.getJSONObject("place");
+            eventLocation = updateLocationFromJson(placeJSON, eventLocation);
+        } catch (JSONException e) {
+            eventLocation = null;
+        }
 
-        eventStartTime = dateTimeFromJsonString(eventJSON.getString("start_time"));
+
+        try {
+            eventStartTime = dateTimeFromJsonString(eventJSON.getString("start_time"));
+        } catch (JSONException e) {
+            eventStartTime = null;
+        }
 
         event.setTitle(eventName);
         event.setLocation(eventLocation);
@@ -331,16 +331,49 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
 
     }
 
-    private com.example.ilay.myapplication.backend.trempitApi.model.Location updateLocationFromJson(JSONObject placeJSON, com.example.ilay.myapplication.backend.trempitApi.model.Location location) throws JSONException {
-        // get the location object inside the place object (facebook graph api)
-        JSONObject locationJSON = placeJSON.getJSONObject("location");
+    private com.example.ilay.myapplication.backend.trempitApi.model.Location updateLocationFromJson(JSONObject placeJSON, com.example.ilay.myapplication.backend.trempitApi.model.Location location)  {
 
-        location.setLongitude((float) locationJSON.getDouble("longitude"));
-        location.setLongitude((float) locationJSON.getDouble("latitude"));
-        location.setCountry(locationJSON.getString("country"));
-        location.setCity(locationJSON.getString("city"));
-        location.setStreet(locationJSON.getString("street"));
-        location.setName(placeJSON.getString("name"));
+
+        try {
+            location.setName(placeJSON.getString("name"));
+        } catch (JSONException ignored) {
+
+        }
+
+        // get the location object inside the place object (facebook graph api)
+        JSONObject locationJSON = null;
+        try {
+            locationJSON = placeJSON.getJSONObject("location");
+        } catch (JSONException e) {
+            return location; // if the place field does not exist, we return the event only with the name
+        }
+
+        try {
+            location.setLongitude((float) locationJSON.getDouble("longitude"));
+        } catch (JSONException ignored) {
+
+        }
+        try {
+            location.setLatitude((float) locationJSON.getDouble("latitude"));
+        } catch (JSONException ignored) {
+
+        }
+        try {
+            location.setCountry(locationJSON.getString("country"));
+        } catch (JSONException ignored) {
+
+        }
+        try {
+            location.setCity(locationJSON.getString("city"));
+        } catch (JSONException ignored) {
+
+        }
+        try {
+            location.setStreet(locationJSON.getString("street"));
+        } catch (JSONException ignored) {
+
+        }
+
 
         return location;
     }
@@ -362,8 +395,6 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 e.printStackTrace();
             }
         }
-
-
 
         return new DateTime(date);
     }
