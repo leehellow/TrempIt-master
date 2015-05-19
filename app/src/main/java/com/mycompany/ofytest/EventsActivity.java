@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
 import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
@@ -73,7 +75,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         final ListView listView = (ListView) findViewById(R.id.eventlistview);
         listView.setAdapter(eventAdapter);
 
-        createEventFromUrl("https://www.facebook.com/events/636118563156949/");
+        //createEventFromUrl("https://www.facebook.com/events/636118563156949/");
         Log.d("Trempit", "after add facebook");
     }
 
@@ -247,11 +249,22 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         }
     }
 
+    public void createFacebookEventOnClick(View view) {
+
+        // get the string from the url textview
+        TextView textView = (TextView) findViewById(R.id.urltext);
+        String urlString = textView.getText().toString();
+
+        createEventFromUrl(urlString);
+
+    }
+
     private void createEventFromUrl(String urlString) {
         long eventId = parseUrlToId(urlString);
         addFacebookEvent(eventId);
     }
 
+    //TODO: handle parsing errors
     private long parseUrlToId(String urlString) {
         Uri uri = null;
         uri = Uri.parse(urlString);
@@ -259,10 +272,10 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         return Long.valueOf(idString);
     }
 
-    private void addFacebookEvent(long eventId) {
+    private void addFacebookEvent(final long eventId) {
         // initialize the the objects
         final Event event =  new Event();
-        event.setId(eventId);
+        //event.setId(new Long(eventId)); //TODO: backend gets null id
         com.example.ilay.myapplication.backend.trempitApi.model.Location location = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
 
         // add parameters for the facebook request
@@ -280,16 +293,17 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
 
                         // update the event fields using the JSON object from the graph response
                         JSONObject eventJSON = graphResponse.getJSONObject();
-                        updateEventFromJson(eventJSON, event);
-                        Log.v("Trempit", event.getTitle());
-                        Log.v("Trempit", event.getLocation().getLatitude().toString());
-                        Log.v("Trempit", event.getStartTime().toString());
+                        updateEventFromJson(eventJSON, event, eventId);
+//                        Log.v("Trempit", event.getTitle());
+//                        Log.v("Trempit", event.getLocation().getLatitude().toString());
+//                        Log.v("Trempit", event.getStartTime().toString());
 
                         // add the event to the event list, and update the listview
                         // TODO: add the event object to the datastore
-                        events.add(event);
                         eventAdapter.add(event);
                         eventAdapter.notifyDataSetChanged();
+
+                        insertEventToServer(event);
                     }
                 });
 
@@ -299,7 +313,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
     }
 
     // updates the relevant fields of the Event object from a graph request JSON object
-    private void updateEventFromJson(JSONObject eventJSON, Event event) {
+    private void updateEventFromJson(JSONObject eventJSON, Event event, Long eventId) {
         String eventName;
         DateTime eventStartTime;
         com.example.ilay.myapplication.backend.trempitApi.model.Location eventLocation = new com.example.ilay.myapplication.backend.trempitApi.model.Location();
@@ -313,7 +327,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
 
         try {
             placeJSON = eventJSON.getJSONObject("place");
-            eventLocation = updateLocationFromJson(placeJSON, eventLocation);
+            eventLocation = updateLocationFromJson(placeJSON, eventLocation, eventId);
         } catch (JSONException e) {
             eventLocation = null;
         }
@@ -331,8 +345,8 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
 
     }
 
-    private com.example.ilay.myapplication.backend.trempitApi.model.Location updateLocationFromJson(JSONObject placeJSON, com.example.ilay.myapplication.backend.trempitApi.model.Location location)  {
-
+    private com.example.ilay.myapplication.backend.trempitApi.model.Location updateLocationFromJson(JSONObject placeJSON, com.example.ilay.myapplication.backend.trempitApi.model.Location location, Long eventId)  {
+        location.setId(eventId);
 
         try {
             location.setName(placeJSON.getString("name"));
@@ -399,6 +413,74 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         return new DateTime(date);
     }
 
+
+    // convert from internal Java String format -> UTF-8
+    // from: http://stackoverflow.com/a/27973192
+    public static String convertToUTF8(String s) {
+        String out = null;
+        try {
+            out = new String(s.getBytes("UTF-8"), "ISO-8859-1");
+        } catch (java.io.UnsupportedEncodingException e) {
+            return null;
+        }
+        return out;
+    }
+
+    // adds the event to the backend server
+    private void insertEventToServer(Event event) {
+        new addEventEndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR, event);
+    }
+
+    class addEventEndpointsAsyncTask extends AsyncTask<Event, Void, Boolean> {
+        private  TrempitApi myApiService = null;
+        private Context context;
+
+        addEventEndpointsAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(Event... params) {
+            if(myApiService == null) {  // Only do this once
+                TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        }).setApplicationName("Trempit");
+                // end options for devappserver
+
+                myApiService = builder.build();
+            }
+
+            try {
+                myApiService.insertLocation(params[0].getLocation()).execute();
+                myApiService.insertEvent(params[0]).execute();
+
+            } catch (IOException e) {
+                Log.d("Trempit", "IO error");
+                return Boolean.FALSE;
+            }
+
+            return Boolean.FALSE.TRUE;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean param) {
+            if (param == Boolean.FALSE) {
+                Toast.makeText(context, "failed to create event" , Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+
+    }
+
     class BuildTestEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
         private  TrempitApi myApiService = null;
         private Context context;
@@ -461,7 +543,7 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 trempitUser1.setFullName("Eran Katz");
                 trempitUser1.setHomeLocation(location3);
                 currentUser = trempitUser1;
-                //globalState.setCurrentUser(currentUser);
+                globalState.setCurrentUser(currentUser);
 
                 TrempitUser trempitUser2 = new TrempitUser();
                 trempitUser2.setId((long) 2);
