@@ -104,6 +104,11 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
         Intent intent = new Intent(this, DriversActivity.class);
 
         intent.putExtra("event", event.getId());
+
+        // for map activity
+        intent.putExtra("eventLat", event.getLocation().getLatitude());
+        intent.putExtra("eventLng", event.getLocation().getLongitude());
+
         Log.d("TrempIt", "EventsActivity " + String.valueOf(event.getId()));
         startActivity(intent);
     }

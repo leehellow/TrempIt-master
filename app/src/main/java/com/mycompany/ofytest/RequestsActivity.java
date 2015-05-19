@@ -1,7 +1,6 @@
 package com.mycompany.ofytest;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -10,10 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
-import com.example.ilay.myapplication.backend.trempitApi.model.Event;
 import com.example.ilay.myapplication.backend.trempitApi.model.Passenger;
 import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -91,7 +88,7 @@ public class RequestsActivity extends ActionBarActivity {
             try {
                 //myApiService.insertLocation(currentUser.getHomeLocation()).execute();
                 //myApiService.insertTrempitUser(currentUser).execute();
-                return myApiService.listPendingPassengers((long) 2).execute().getItems();
+                return myApiService.listPendingPassengers(currentUser.getId()).execute().getItems();
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
                 return Collections.EMPTY_LIST;

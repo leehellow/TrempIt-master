@@ -11,13 +11,25 @@
         />
 
     <Button
-        android:id="@+id/refreshButton"
+        android:id="@+id/mapButton"
         android:layout_width="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_height="wrap_content"
         android:layout_below="@id/signupButton"
+        android:onClick="startMap"
+        android:text="Show map"/>
+
+    <Button
+        android:id="@+id/refreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:onClick="refreshActivity"
-        android:text="Refresh"/>
+        android:text="Refresh"
+        android:layout_below="@+id/signupButton"
+        android:layout_toRightOf="@+id/mapButton"
+        android:layout_toEndOf="@+id/mapButton"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp" />
 
     <ListView
         android:id="@+id/driverlistview"

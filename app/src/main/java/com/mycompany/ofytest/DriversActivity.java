@@ -43,6 +43,10 @@ public class DriversActivity extends ActionBarActivity{
     Driver currDriver;
     Long eventId;
 
+    //for map activity
+    float eventLat;
+    float eventLng;
+
     GlobalState globalState;
 
     @Override
@@ -58,6 +62,11 @@ public class DriversActivity extends ActionBarActivity{
 
         Intent intent = getIntent();
         eventId = (Long) intent.getLongExtra("event", -1);
+
+        // for map activity
+        eventLat = intent.getFloatExtra("eventLat", (float) -1.0);
+        eventLng = intent.getFloatExtra("eventLng", (float) -1.0);
+
         //Log.d("TrempIt", String.valueOf(currentUser.getId()));
 
         driverAdapter  = new DriverAdapter(this, drivers);
@@ -230,6 +239,13 @@ public class DriversActivity extends ActionBarActivity{
             try {
                 // add the passenger to the server
                 myApiService.addPassengerToEvent(eventId, currentUser.getId(), params[0]).execute();
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 // update the current trempit user passenger list
                 myApiService.addPassengerToTrempitUser(params[0].getId(), currentUser.getId());
 
@@ -300,6 +316,13 @@ public class DriversActivity extends ActionBarActivity{
             try {
                 // add the passenger to the server
                 myApiService.addDriverToEvent(eventId, currentUser.getId(), params[0]).execute();
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 // update the current trempit user passenger list
                 myApiService.addDriverToTrempitUser(params[0].getId(), currentUser.getId());
 
@@ -375,6 +398,63 @@ public class DriversActivity extends ActionBarActivity{
         }
 
 
+    }
+
+
+
+
+
+    //********************* for map activity
+
+
+    public String[] getDriversName (){
+        String[] namesArr = new String[drivers.size()];
+        for(int i = 0; i < drivers.size() ; i++) {
+            namesArr[i] = drivers.get(i).getFullName();
+        }
+        return namesArr;
+    }
+
+    public Long[] getDriversId (){
+        Long[] idArr = new Long[drivers.size()];
+        for(int i = 0; i < drivers.size() ; i++) {
+            idArr[i] = drivers.get(i).getId();
+        }
+        return idArr;
+    }
+
+    public float[] getDriversLat (){
+        float[] latArr = new float[drivers.size()];
+        for(int i = 0; i < drivers.size() ; i++) {
+            latArr[i] = drivers.get(i).getStartingLocation().getLatitude();
+        }
+        return latArr;
+    }
+
+
+    public float[] getDriversLng (){
+        float[] lngArr = new float[drivers.size()];
+        for(int i = 0; i < drivers.size() ; i++) {
+            lngArr[i] = drivers.get(i).getStartingLocation().getLongitude();
+        }
+        return lngArr;
+    }
+
+
+
+
+
+
+
+    public void startMap(View view){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("nameslist", getDriversName());
+        intent.putExtra("idList", getDriversId());
+        intent.putExtra("latList", getDriversLat());
+        intent.putExtra("lngList", getDriversLng());
+        intent.putExtra("eventLat", eventLat);
+        intent.putExtra("eventLng", eventLng);
+        startActivity(intent);
     }
 
 }

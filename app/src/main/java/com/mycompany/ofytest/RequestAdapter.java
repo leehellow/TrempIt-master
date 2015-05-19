@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.ilay.myapplication.backend.trempitApi.model.Passenger;
-import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
 
 import java.util.List;
 
@@ -31,8 +30,8 @@ public class RequestAdapter extends ArrayAdapter<Passenger> {
         }
 
         String username = passenger.getFullName();
-        String location = passenger.getStartingLocation().getStreet() + ", " + passenger.getStartingLocation().getCity();
-        String event = "Wedding";
+        String location = TrempitUtils.parseLocation(passenger.getStartingLocation());
+        String event = passenger.getEvent().getTitle();
 
         Button aprroveButton = (Button) convertView.findViewById(R.id.approveButton);
         Button declineButton = (Button) convertView.findViewById(R.id.declineButton);
