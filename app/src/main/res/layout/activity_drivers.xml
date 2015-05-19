@@ -7,7 +7,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Sign up as driver"
-        android:onClick="goToSignup"
+        android:onClick="driverSignupOnClick"
         />
 
     <Button

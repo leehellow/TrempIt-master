@@ -10,11 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
 import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
 import com.example.ilay.myapplication.backend.trempitApi.model.Event;
 import com.example.ilay.myapplication.backend.trempitApi.model.Location;
+import com.example.ilay.myapplication.backend.trempitApi.model.Passenger;
 import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -37,6 +39,8 @@ public class DriversActivity extends ActionBarActivity{
     ArrayList<Driver> drivers = new ArrayList<>();
     DriverAdapter driverAdapter;
     TrempitUser currentUser;
+    Passenger currPassenger;
+    Driver currDriver;
     Long eventId;
 
     GlobalState globalState;
@@ -48,6 +52,9 @@ public class DriversActivity extends ActionBarActivity{
 
         globalState = (GlobalState) getApplicationContext();
         currentUser = globalState.getCurrentUser();
+
+        currPassenger = createPassengerFromTrempitUser(currentUser);
+        insertPassengerToServer(currPassenger);
 
         Intent intent = getIntent();
         eventId = (Long) intent.getLongExtra("event", -1);
@@ -96,8 +103,16 @@ public class DriversActivity extends ActionBarActivity{
         Intent intent = new Intent(this, DriverProfileActivity.class);
         intent.putExtra("driverid", driver.getId());
         intent.putExtra("eventid", eventId);
+        intent.putExtra("passengerid" , currPassenger.getId());
         Log.d("TrempIt", "DriversActivity " + String.valueOf(eventId));
         startActivity(intent);
+    }
+
+    public void driverSignupOnClick(View view) {
+        removePassengerFromServer(currPassenger.getId());
+        Driver driver = createDriverFromTrempitUser(currentUser);
+        insertDriverToServer(driver);
+        driverAdapter.add(driver);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Void, Void, List<Driver>> {
@@ -165,6 +180,201 @@ public class DriversActivity extends ActionBarActivity{
 
 
         }
+    }
+
+    // create a passenger object using the fields of a trempit user
+    private Passenger createPassengerFromTrempitUser (TrempitUser trempitUser) {
+        Passenger passenger = new Passenger();
+        passenger.setTrempitUser(trempitUser);
+        passenger.setFullName(trempitUser.getFullName());
+        passenger.setStartingLocation(trempitUser.getHomeLocation());
+
+        passenger.setId(trempitUser.getId()); //TODO: figure out how to set the id to be unique, or let the backend create the id automatically without problems
+
+        return passenger;
+    }
+
+    // adds the passenger to the backend server
+    private void insertPassengerToServer(Passenger passenger) {
+        new addPassengerEndpointsAsyncTask(this).executeOnExecutor(addPassengerEndpointsAsyncTask.THREAD_POOL_EXECUTOR, passenger);
+    }
+
+
+    class addPassengerEndpointsAsyncTask extends AsyncTask<Passenger, Void, Boolean> {
+        private  TrempitApi myApiService = null;
+        private Context context;
+
+        addPassengerEndpointsAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(Passenger... params) {
+            if(myApiService == null) {  // Only do this once
+                TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        }).setApplicationName("Trempit");
+                // end options for devappserver
+
+                myApiService = builder.build();
+            }
+
+            try {
+                // add the passenger to the server
+                myApiService.addPassengerToEvent(eventId, currentUser.getId(), params[0]).execute();
+                // update the current trempit user passenger list
+                myApiService.addPassengerToTrempitUser(params[0].getId(), currentUser.getId());
+
+            } catch (IOException e) {
+                Log.d("Trempit", "IO error");
+                return Boolean.FALSE;
+            }
+
+            return Boolean.TRUE;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean param) {
+            if (param == Boolean.FALSE) {
+                Toast.makeText(context, "failed to create passenger", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+
+    }
+
+    // create a driver object using the fields of a trempit user
+    private Driver createDriverFromTrempitUser (TrempitUser trempitUser) {
+        Driver driver = new Driver();
+        driver.setTrempitUser(trempitUser);
+        driver.setFullName(trempitUser.getFullName());
+        driver.setStartingLocation(trempitUser.getHomeLocation());
+        driver.setAvailableSeats(TrempitConstants.DEFAULT_AVAILABLE_SEATS);
+
+        driver.setId(trempitUser.getId()); //TODO: figure out how to set the id to be unique, or let the backend create the id automatically without problems
+
+        return driver;
+    }
+
+    // adds the passenger to the backend server
+    private void insertDriverToServer(Driver driver) {
+        new addDriverEndpointsAsyncTask(this).executeOnExecutor(addDriverEndpointsAsyncTask.THREAD_POOL_EXECUTOR, driver);
+    }
+
+    class addDriverEndpointsAsyncTask extends AsyncTask<Driver, Void, Boolean> {
+        private  TrempitApi myApiService = null;
+        private Context context;
+
+        addDriverEndpointsAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(Driver... params) {
+            if(myApiService == null) {  // Only do this once
+                TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        }).setApplicationName("Trempit");
+                // end options for devappserver
+
+                myApiService = builder.build();
+            }
+
+            try {
+                // add the passenger to the server
+                myApiService.addDriverToEvent(eventId, currentUser.getId(), params[0]).execute();
+                // update the current trempit user passenger list
+                myApiService.addDriverToTrempitUser(params[0].getId(), currentUser.getId());
+
+            } catch (IOException e) {
+                Log.d("Trempit", "IO error");
+                return Boolean.FALSE;
+            }
+
+            return Boolean.TRUE;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean param) {
+            if (param == Boolean.FALSE) {
+                Toast.makeText(context, "failed to create driver", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+
+    }
+
+    // removes the passenger from the backend server
+    private void removePassengerFromServer(Long passengerId) {
+        new removePassengerEndpointsAsyncTask(this).executeOnExecutor(addDriverEndpointsAsyncTask.THREAD_POOL_EXECUTOR, passengerId);
+    }
+
+    class removePassengerEndpointsAsyncTask extends AsyncTask<Long, Void, Boolean> {
+        private  TrempitApi myApiService = null;
+        private Context context;
+
+        removePassengerEndpointsAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(Long... params) {
+            if(myApiService == null) {  // Only do this once
+                TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl(TrempitConstants.SERVERPATH).setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        }).setApplicationName("Trempit");
+                // end options for devappserver
+
+                myApiService = builder.build();
+            }
+
+            try {
+                // add the passenger to the server
+                myApiService.removePassenger(params[0]).execute();
+
+            } catch (IOException e) {
+                Log.d("Trempit", "IO error");
+                return Boolean.FALSE;
+            }
+
+            return Boolean.TRUE;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean param) {
+            if (param == Boolean.FALSE) {
+                Toast.makeText(context, "failed to remove passenger", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+
     }
 
 }

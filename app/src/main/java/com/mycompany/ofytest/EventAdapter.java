@@ -31,33 +31,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         button.setTransformationMethod(null);
 
 
-        String startTime = event.getStartTime().toStringRfc3339();
-//        String startTime = null;
-        String street = null;
-        String city = null;
-
-        // if the event doesn't contain a location, don't show it
-        if (event.getLocation() != null) {
-            street = event.getLocation().getStreet();
-            city = event.getLocation().getCity();
-
-        }
-        String title = event.getTitle();
-
-        // format the text on the label according to the existing event fields
-        String labelString = "";
-        if (title != null) {
-            labelString = labelString + title;
-        }
-        if (startTime != null) {
-            labelString = labelString + "\n" + startTime;
-        }
-        if (street != null) {
-            labelString = labelString + "\n" + street;
-        }
-        if (city != null) {
-            labelString = labelString +", " + city;
-        }
+        String labelString = TrempitUtils.parseEvent(event);
 
 
         button.setText(labelString);

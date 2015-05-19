@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
-import com.example.ilay.myapplication.backend.trempitApi.model.Event;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class DriverAdapter extends ArrayAdapter<Driver> {
         }
         Button button = (Button) convertView.findViewById(R.id.driverButton);
         button.setTransformationMethod(null);
-        button.setText(driver.getFullName() + "\n" + driver.getStartingLocation().getStreet() + ", " + driver.getStartingLocation().getCity());
+        button.setText(TrempitUtils.parseDriver(driver));
         button.setTag(driver);
 
         return convertView;

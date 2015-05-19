@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,17 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ilay.myapplication.backend.trempitApi.TrempitApi;
-import com.example.ilay.myapplication.backend.trempitApi.model.Event;
-import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
 import com.example.ilay.myapplication.backend.trempitApi.model.Driver;
+import com.example.ilay.myapplication.backend.trempitApi.model.TrempitUser;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 //import com.example.ilay.myapplication.backend.trempitUserApi.model.TrempitUser;
 
 //import com.example.Ilay.myapplication.backend.Driver;
@@ -40,6 +35,7 @@ public class DriverProfileActivity extends ActionBarActivity {
     long driverId;
     long eventId;
     Driver driver;
+    long passengerId;
 
     TrempitUser currentUser;
     GlobalState globalState;
@@ -54,6 +50,7 @@ public class DriverProfileActivity extends ActionBarActivity {
         Intent intent = getIntent();
         driverId = (long) intent.getLongExtra("driverid", -1);
         eventId = (long) intent.getLongExtra("eventid", -1);
+        passengerId = (long) intent.getLongExtra("passengerid", -1);
         Log.d("TrempIt", String.valueOf(driverId));
         currentUser = globalState.getCurrentUser();
         displayDriverData();
@@ -75,14 +72,21 @@ public class DriverProfileActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void sendRequestOnClick(View view) {
+        sendPassengerRequestToCurrentDriver(passengerId);
+    }
+
+
+
+
 
     public void displayDriverData() {
         new EndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public void sendRequest(View view) {
+    private void sendPassengerRequestToCurrentDriver(long passengerId) {
         Log.d("TrempIt", "DriversProfileActivity " + String.valueOf(eventId));
-        new RequestEndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR);
+        new RequestEndpointsAsyncTask(this).executeOnExecutor(EndpointsAsyncTask.THREAD_POOL_EXECUTOR, passengerId);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Void, Void, Driver> {
@@ -128,7 +132,7 @@ public class DriverProfileActivity extends ActionBarActivity {
 //
 //            }
             if (result == null || result.isEmpty()) {
-                Log.d("TrempIt", "No driver retrieved");
+                Log.d("TrempIt", "No currDriver retrieved");
                 return;
             }
 
@@ -149,17 +153,17 @@ public class DriverProfileActivity extends ActionBarActivity {
             availableSeats.setText("available seats: " + numberOfSeats);
 
             TextView startingLocation = (TextView) findViewById(R.id.startingLocation);
-            startingLocation.setText(driver.getStartingLocation().getStreet() + ", " + driver.getStartingLocation().getCity());
+            startingLocation.setText(TrempitUtils.parseLocation(driver.getStartingLocation()));
 
             TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-            arrivalTime.setText(result.getArrivalTime().toStringRfc3339());
+            arrivalTime.setText(TrempitUtils.parseDateTime(driver.getArrivalTime()));
 
 
         }
     }
 
 
-    class RequestEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
+    class RequestEndpointsAsyncTask extends AsyncTask<Long, Void, Boolean> {
         private TrempitApi myApiService = null;
         private Context context;
 
@@ -168,7 +172,7 @@ public class DriverProfileActivity extends ActionBarActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Boolean doInBackground(Long... params) {
             if(myApiService == null) {  // Only do this once
                 TrempitApi.Builder builder = new TrempitApi.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
@@ -189,24 +193,45 @@ public class DriverProfileActivity extends ActionBarActivity {
             try {
                 //TODO: figure out how to extract passenger id from trempitUser id: serverside or clientside
                 Log.d("TrempIt", "RequestAsyncTask " + String.valueOf(eventId));
-                myApiService.addPassengerRequest(driver.getId(), currentUser.getPassengerList().get(0).getId()).execute();
-                return null;
+                myApiService.addPassengerRequest(driver.getId(), params[0]).execute();
+
+                return Boolean.TRUE;
             } catch (IOException e) {
                 Log.d("Trempit", "IO error");
-                return null;
+                return Boolean.FALSE;
             }
 
         }
 
         @Override
-        protected void onPostExecute(Void v) {
-            Toast.makeText(context, "Request sent to driver!", Toast.LENGTH_LONG).show();
+        protected void onPostExecute(Boolean param) {
+            if (param == Boolean.TRUE) { // the request succeeded
+                Toast.makeText(context, "Request sent to Driver!", Toast.LENGTH_LONG).show();
+            }
+            else { // the request failed
+                Toast.makeText(context, "failed to make request", Toast.LENGTH_LONG).show();
+            }
         }
 
 
 
 
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
 

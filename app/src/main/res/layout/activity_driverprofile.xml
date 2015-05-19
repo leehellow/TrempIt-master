@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:text="Send request"
-        android:onClick="sendRequest"
+        android:onClick="sendRequestOnClick"
         />
 
     <TextView

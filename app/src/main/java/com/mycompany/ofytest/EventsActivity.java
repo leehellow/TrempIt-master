@@ -542,8 +542,8 @@ public class EventsActivity extends ActionBarActivity implements GoogleApiClient
                 trempitUser1.setId((long) 1);
                 trempitUser1.setFullName("Eran Katz");
                 trempitUser1.setHomeLocation(location3);
-                currentUser = trempitUser1;
-                globalState.setCurrentUser(currentUser);
+                //currentUser = trempitUser1;
+                //globalState.setCurrentUser(currentUser);
 
                 TrempitUser trempitUser2 = new TrempitUser();
                 trempitUser2.setId((long) 2);

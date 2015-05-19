@@ -145,6 +145,28 @@ public class TrempitUserEndpoint {
 
     }
 
+
+    /**
+     * Updates an existing {@code TrempitUser}.
+     *
+     * @param driverId      the ID of the entity to be updated
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     *                           {@code TrempitUser}
+     */
+    @ApiMethod(
+            name = "addDriverToTrempitUser",
+            path = "trempitUser/addDriverToUser",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void addDriverToUser(@Named("TrempitUserId") Long TrempitUserId, @Named("DriverId") Long driverId) throws NotFoundException {
+        // TODO: You should validate your ID parameter against your resource's ID here.
+        EndpointUtils.checkTrempitUserExists(TrempitUserId);
+        TrempitUser trempitUser = ofy().load().type(TrempitUser.class).id(TrempitUserId).now();
+        Driver driver = ofy().load().type(Driver.class).id(driverId).now();
+        trempitUser.addDriverToUser(driver);
+        ofy().save().entity(trempitUser).now();
+
+    }
+
     /**
      * List all entities.
      *
